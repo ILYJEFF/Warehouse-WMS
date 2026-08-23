@@ -623,7 +623,7 @@ table.data tbody tr.row-link:hover td:not(:has(form)) {
   background: #f5f5f5;
 }
 
-/* Same nav on narrow screens: horizontal scroll, same colors */
+/* Shared sidebar link styles (desktop rail + mobile drawer) */
 .side-nav-link {
   border-left: 3px solid transparent;
   color: #b8c7ce;
@@ -642,28 +642,93 @@ table.data tbody tr.row-link:hover td:not(:has(form)) {
   color: #fff;
 }
 
-@media (max-width: 1023px) {
-  .side-nav {
-    display: flex;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-  }
+.mobile-nav-toggle {
+  display: inline-flex;
+  height: 36px;
+  width: 36px;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 3px;
+  background: rgb(255 255 255 / 14%);
+  color: #fff;
+  cursor: pointer;
+}
 
-  .side-nav li {
-    flex: 0 0 auto;
-  }
+.mobile-nav-toggle:hover {
+  background: rgb(255 255 255 / 22%);
+}
 
-  .side-nav-link {
-    border-left: 0;
-    border-bottom: 3px solid transparent;
-    padding-top: 10px;
-    padding-bottom: 10px;
-  }
+.mobile-nav-root {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+}
 
-  .side-nav-link.is-active {
-    border-bottom-color: #3c8dbc;
-    background: #1a2226;
+.mobile-nav-backdrop {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  background: rgb(0 0 0 / 45%);
+  cursor: pointer;
+}
+
+.mobile-nav-drawer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: flex;
+  height: 100%;
+  width: min(230px, 86vw);
+  flex-direction: column;
+  background: #222d32;
+  box-shadow: 6px 0 18px rgb(0 0 0 / 28%);
+  animation: mobile-nav-in 160ms ease-out;
+}
+
+@keyframes mobile-nav-in {
+  from {
+    transform: translateX(-100%);
   }
+  to {
+    transform: translateX(0);
+  }
+}
+
+.mobile-nav-drawer-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  border-bottom: 1px solid #1a2226;
+  background: #1a2226;
+  padding: 0.85rem 0.75rem;
+}
+
+.mobile-nav-drawer-body {
+  flex: 1;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.mobile-nav-drawer-foot {
+  border-top: 1px solid #1a2226;
+  padding: 0.75rem;
+}
+
+.mobile-nav-signout {
+  display: flex;
+  width: 100%;
+  min-height: 40px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgb(255 255 255 / 16%);
+  border-radius: 3px;
+  background: rgb(255 255 255 / 8%);
+  color: #fff;
+  font-size: 13px;
+  cursor: pointer;
 }
 
 .login-shell {
