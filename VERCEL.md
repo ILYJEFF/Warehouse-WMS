@@ -1,44 +1,64 @@
-# Vercel deploy (optional — NAS is the main setup)
+# Vercel + Neon (production)
 
-Vercel **cannot** use `192.168.0.24` for Postgres. You need a **cloud** database.
+Vercel cannot talk to your NAS (`192.168.0.24`). Use **Neon** for Postgres.
 
-## Quick fix for warehousewms.vercel.app
+## 1. Create the database (Neon)
 
-### 1. Create free Postgres at [neon.tech](https://neon.tech)
+1. Go to [https://console.neon.tech](https://console.neon.tech) and sign in
+2. **New Project** → name it `warehouse-wms` → region close to you (e.g. US East)
+3. Open the project → **Connection details**
+4. Copy the connection string (starts with `postgresql://…`)
+   - Use the one labeled **pooled** / includes `-pooler` if Neon shows both
+   - Keep `?sslmode=require` on the end (Neon includes it)
 
-Copy the connection string (starts with `postgresql://`).
+## 2. Add env vars in Vercel
 
-### 2. Vercel → Project → Settings → Environment Variables
-
-Add all of these:
+Vercel → your project → **Settings** → **Environment Variables**  
+Add for **Production** (and Preview if you want):
 
 | Name | Value |
 |---|---|
-| `DATABASE_URL` | your Neon connection string |
-| `AUTH_SECRET` | any random string 32+ chars |
-| `APP_URL` | `https://warehousewms.vercel.app` |
+| `DATABASE_URL` | Neon connection string from step 1 |
+| `AUTH_SECRET` | long random string (32+ chars) |
+| `APP_URL` | `https://warehousewms.vercel.app` (or your custom domain) |
 | `ADMIN_EMAIL` | `dispatch@techchefstx.com` |
 | `ADMIN_PASSWORD` | your login password |
 | `ADMIN_NAME` | `Dispatch` |
-| `SEED_DEMO` | `true` |
+| `SEED_DEMO` | `true` (first deploy only; set `false` later) |
 
-### 3. Create tables (once, from your PC)
+## 3. Create tables + seed (from your Mac)
 
-```powershell
-cd wms
-$env:DATABASE_URL="your-neon-connection-string"
-npx prisma db push
-npm run db:seed
+In this repo folder:
+
+```bash
+cp .env.example .env
 ```
 
-### 4. Redeploy on Vercel
+Edit `.env` so `DATABASE_URL` is your Neon string, then:
 
-Deployments → Redeploy latest.
+```bash
+npm install
+npx prisma db push
+SEED_DEMO=true npm run db:seed
+```
 
----
+Login after seed:
 
-## Recommended: use NAS instead
+- Email: `dispatch@techchefstx.com`
+- Password: whatever you set in `ADMIN_PASSWORD` / seed env
 
-`https://warehouse.techchefstx.work` via Docker on your NAS (see `REBUILD.md`).
+## 4. Redeploy Vercel
 
-No Vercel, no extra cloud database, same network as your shop.
+**Deployments** → latest → **Redeploy** (or push a commit to `main`).
+
+Open `https://warehousewms.vercel.app` and sign in.
+
+## Local `npm run dev` against Neon
+
+Same `.env` with Neon `DATABASE_URL` works for local dev. You do not need Docker Postgres.
+
+## If login shows “Database not configured”
+
+- `DATABASE_URL` is missing, wrong, or still points at `192.168.0.24`
+- Redeploy after saving env vars (Vercel only injects them on a new deploy)
+- Run `prisma db push` once against that same URL
