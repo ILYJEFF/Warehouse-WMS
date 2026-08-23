@@ -1,9 +1,5 @@
-# Paste this entire file into UGREEN Docker Project, then Deploy.
-# No .env file. No Dockerfile. No build step.
-#
-# LAN:     http://192.168.0.24:3090
-# Public:  https://warehouse.techchefstx.work  (Cloudflare → http://192.168.0.24:3090)
-# Login:   dispatch@techchefstx.com / Oatmilk1769!
+# Techchefs WMS — same as docker-compose.yml
+# Upload wms-deploy.zip to NAS, extract, point Docker Project at that folder.
 
 services:
   db:
@@ -32,8 +28,11 @@ services:
       - max_connections=100
 
   app:
-    image: ghcr.io/ilyjeff/warehouse-wms:latest
-    pull_policy: always
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: techchefs-wms:latest
+    pull_policy: build
     container_name: wms-app
     restart: unless-stopped
     depends_on:

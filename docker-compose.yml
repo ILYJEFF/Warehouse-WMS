@@ -1,11 +1,9 @@
-# Techchefs WMS on NAS
-# Public: https://warehouse.techchefstx.work  (your existing Cloudflare tunnel)
-# LAN:    http://192.168.0.24:3090
+# Techchefs WMS — self-contained (no .env, no GHCR)
+# NAS: copy this whole folder to the NAS, point Docker Project at it, Deploy.
+# PC:  docker compose up -d --build
 #
-# On the NAS, in this folder:
-#   1. Copy env.nas.example → .env  (edit passwords if you want)
-#   2. docker compose up -d --build
-#   3. In Cloudflare: warehouse.techchefstx.work → http://192.168.0.24:3090
+# LAN:     http://192.168.0.24:3090
+# Public:  https://warehouse.techchefstx.work
 
 services:
   db:
@@ -16,13 +14,13 @@ services:
       - "5435:5432"
     environment:
       TZ: America/Chicago
-      POSTGRES_USER: ${POSTGRES_USER:-wms}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Copy env.nas.example to .env first}
-      POSTGRES_DB: ${POSTGRES_DB:-wms}
+      POSTGRES_USER: wms
+      POSTGRES_PASSWORD: "Oatmilk1769!"
+      POSTGRES_DB: wms
     volumes:
       - wms-pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-wms} -d ${POSTGRES_DB:-wms}"]
+      test: ["CMD-SHELL", "pg_isready -U wms -d wms"]
       interval: 5s
       timeout: 5s
       retries: 20
@@ -38,6 +36,7 @@ services:
       context: .
       dockerfile: Dockerfile
     image: techchefs-wms:latest
+    pull_policy: build
     container_name: wms-app
     restart: unless-stopped
     depends_on:
@@ -47,13 +46,13 @@ services:
       - "3090:3090"
     environment:
       TZ: America/Chicago
-      DATABASE_URL: postgresql://${POSTGRES_USER:-wms}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-wms}
-      AUTH_SECRET: ${AUTH_SECRET:?Copy env.nas.example to .env first}
-      APP_URL: ${APP_URL:-https://warehouse.techchefstx.work}
-      ADMIN_EMAIL: ${ADMIN_EMAIL:-dispatch@techchefstx.com}
-      ADMIN_PASSWORD: ${ADMIN_PASSWORD:?Copy env.nas.example to .env first}
-      ADMIN_NAME: ${ADMIN_NAME:-Dispatch}
-      SEED_DEMO: ${SEED_DEMO:-true}
+      DATABASE_URL: postgresql://wms:Oatmilk1769!@db:5432/wms
+      AUTH_SECRET: techchefs-wms-change-me-to-32chars-min
+      APP_URL: https://warehouse.techchefstx.work
+      ADMIN_EMAIL: dispatch@techchefstx.com
+      ADMIN_PASSWORD: "Oatmilk1769!"
+      ADMIN_NAME: Dispatch
+      SEED_DEMO: "true"
 
 volumes:
   wms-pgdata:

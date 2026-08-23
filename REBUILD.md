@@ -1,49 +1,40 @@
-# Rebuild WMS on UGREEN (fresh start)
+# Deploy WMS on UGREEN
 
-## 1. Stop and remove old project
-
-UGREEN **Docker** → **Project** → select your WMS project → **Stop** → **Delete** (or remove containers).
-
-## 2. Create new project
-
-1. **Docker** → **Project** → **Create**
-2. Name: `wms`
-3. Paste **all** of `docker-compose.nas.yml` into the compose editor
-4. **Deploy**
-
-You should see **Pulling** for `ghcr.io/ilyjeff/warehouse-wms` (not **Building**).
-
-## 3. Check it works
-
-- LAN: http://192.168.0.24:3090
-- Login: `dispatch@techchefstx.com` / `Oatmilk1769!`
-
-## 4. Cloudflare
-
-Tunnel hostname: `warehouse.techchefstx.work` → `http://192.168.0.24:3090`
-
----
-
-## If pull says "denied"
-
-GitHub package must be public:
-
-https://github.com/users/ILYJEFF/packages/container/warehouse-wms/settings
-
-→ **Change visibility** → **Public** → Deploy again.
-
-Image build status (should be green):
-
-https://github.com/ILYJEFF/Warehouse-WMS/actions
-
----
-
-## Run locally on your PC while NAS deploys
+## Step 1 — Make the zip on your PC
 
 ```powershell
 cd "C:\Users\Jeffrey Hammitt\Desktop\Techchefs CRM\wms"
-docker compose up -d db
-npm run dev
+.\make-deploy-zip.ps1
+```
+
+This creates **`wms-deploy.zip`** in the `wms` folder.
+
+## Step 2 — Upload to NAS
+
+1. UGREEN **Files** → `shared/docker/`
+2. Upload **`wms-deploy.zip`**
+3. **Extract** it to `shared/docker/wms/`
+4. Confirm **`Dockerfile`** is inside that folder
+
+## Step 3 — Docker Project
+
+1. **Docker** → **Project** → **Create** (delete old broken one first)
+2. Name: `wms`
+3. **Path:** `shared/docker/wms`
+4. Compose file: `docker-compose.yml` (default)
+5. **Deploy** — first build takes ~5 minutes
+
+## Step 4 — Test
+
+- http://192.168.0.24:3090
+- Login: `dispatch@techchefstx.com` / `Oatmilk1769!`
+- Cloudflare: `warehouse.techchefstx.work` → `http://192.168.0.24:3090`
+
+## Run on your PC (same compose)
+
+```powershell
+cd wms
+docker compose up -d --build
 ```
 
 Open http://localhost:3090
