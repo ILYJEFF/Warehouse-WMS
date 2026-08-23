@@ -1,18 +1,11 @@
-# Techchefs WMS — NAS + Cloudflare Tunnel
-# Public: https://warehouse.techchefstx.work
+# Techchefs WMS on NAS
+# Public: https://warehouse.techchefstx.work  (your existing Cloudflare tunnel)
 # LAN:    http://192.168.0.24:3090
 #
-# Setup:
-#   1. cp .env.docker.example .env
-#   2. Set POSTGRES_PASSWORD, AUTH_SECRET, ADMIN_PASSWORD in .env
-#   3. Cloudflare (pick one):
-#        A) Tunnel already on NAS → point warehouse.techchefstx.work at http://192.168.0.24:3090
-#        B) Run tunnel in compose → set TUNNEL_TOKEN, then:
-#             docker compose --profile tunnel up -d --build
-#   4. Default (app + db only):
-#        docker compose up -d --build
-#
-# Postgres stays on LAN port 5435 only. Never tunnel the database.
+# On the NAS, in this folder:
+#   1. Copy env.nas.example → .env  (edit passwords if you want)
+#   2. docker compose up -d --build
+#   3. In Cloudflare: warehouse.techchefstx.work → http://192.168.0.24:3090
 
 services:
   db:
@@ -24,7 +17,7 @@ services:
     environment:
       TZ: America/Chicago
       POSTGRES_USER: ${POSTGRES_USER:-wms}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Copy env.nas.example to .env first}
       POSTGRES_DB: ${POSTGRES_DB:-wms}
     volumes:
       - wms-pgdata:/var/lib/postgresql/data
@@ -55,23 +48,12 @@ services:
     environment:
       TZ: America/Chicago
       DATABASE_URL: postgresql://${POSTGRES_USER:-wms}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-wms}
-      AUTH_SECRET: ${AUTH_SECRET:?Set AUTH_SECRET in .env}
+      AUTH_SECRET: ${AUTH_SECRET:?Copy env.nas.example to .env first}
       APP_URL: ${APP_URL:-https://warehouse.techchefstx.work}
       ADMIN_EMAIL: ${ADMIN_EMAIL:-dispatch@techchefstx.com}
-      ADMIN_PASSWORD: ${ADMIN_PASSWORD:?Set ADMIN_PASSWORD in .env}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:?Copy env.nas.example to .env first}
       ADMIN_NAME: ${ADMIN_NAME:-Dispatch}
       SEED_DEMO: ${SEED_DEMO:-true}
-
-  tunnel:
-    profiles: ["tunnel"]
-    image: cloudflare/cloudflared:latest
-    container_name: wms-tunnel
-    restart: unless-stopped
-    command: tunnel run
-    environment:
-      TUNNEL_TOKEN: ${TUNNEL_TOKEN:?Set TUNNEL_TOKEN in .env when using --profile tunnel}
-    depends_on:
-      - app
 
 volumes:
   wms-pgdata:
