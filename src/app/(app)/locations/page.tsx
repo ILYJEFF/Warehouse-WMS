@@ -1,4 +1,5 @@
-import { assignTruckPerson, createLocation } from "@/lib/actions/stock";
+import { assignTruckPerson } from "@/lib/actions/stock";
+import { AddLocationPanel } from "@/components/add-location-panel";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 
@@ -24,45 +25,7 @@ export default async function LocationsPage() {
         <h1>Locations</h1>
       </div>
       <section className="content">
-        <div className="box box-primary">
-          <div className="box-header">Add Location</div>
-          <div className="box-body">
-            <form action={createLocation} className="grid gap-3 sm:grid-cols-4">
-              <label>
-                <span className="field-label">Code</span>
-                <input className="field" name="code" placeholder="TRK-03" required />
-              </label>
-              <label>
-                <span className="field-label">Name</span>
-                <input className="field" name="name" required />
-              </label>
-              <label>
-                <span className="field-label">Kind</span>
-                <select className="field" name="kind" defaultValue="SHOP">
-                  <option value="SHOP">Shop</option>
-                  <option value="TRUCK">Truck</option>
-                  <option value="OTHER">Other</option>
-                </select>
-              </label>
-              <label>
-                <span className="field-label">Assigned to (trucks)</span>
-                <select className="field" name="assignedUserId" defaultValue="">
-                  <option value="">Unassigned</option>
-                  {users.map((user) => (
-                    <option key={user.id} value={user.id}>
-                      {user.name}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <div className="sm:col-span-4">
-                <button type="submit" className="btn-primary">
-                  Save
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
+        <AddLocationPanel users={users} />
 
         <div className="box">
           <div className="box-header">Location List</div>
@@ -118,7 +81,7 @@ export default async function LocationsPage() {
                             </button>
                           </form>
                         ) : (
-                          <span className="text-muted">—</span>
+                          <span className="text-muted">-</span>
                         )}
                       </td>
                       <td>

@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { Users } from "lucide-react";
-import { createUser } from "@/lib/actions/users";
+import { AddUserPanel } from "@/components/add-user-panel";
 import {
   isAdmin,
   MIN_PASSWORD_LENGTH,
@@ -43,6 +42,8 @@ export default async function UsersPage({
           ? "Name and email are required."
           : null;
 
+  const openForm = Boolean(params.error);
+
   return (
     <>
       <div className="content-header">
@@ -60,56 +61,7 @@ export default async function UsersPage({
           </div>
         ) : null}
 
-        <div className="box box-primary">
-          <div className="box-header flex items-center gap-2">
-            <Users className="h-4 w-4" />
-            Add User
-          </div>
-          <div className="box-body">
-            <form action={createUser} className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-              <label className="block">
-                <span className="field-label">Name</span>
-                <input className="field" name="name" required autoComplete="off" />
-              </label>
-              <label className="block">
-                <span className="field-label">Email</span>
-                <input
-                  className="field"
-                  type="email"
-                  name="email"
-                  required
-                  autoComplete="off"
-                  inputMode="email"
-                />
-              </label>
-              <label className="block">
-                <span className="field-label">Role</span>
-                <select className="field" name="role" defaultValue="USER">
-                  <option value="USER">User</option>
-                  <option value="ADMIN">Admin</option>
-                </select>
-              </label>
-              <label className="block sm:col-span-2">
-                <span className="field-label">
-                  Temporary password (min {MIN_PASSWORD_LENGTH} chars)
-                </span>
-                <input
-                  className="field"
-                  type="password"
-                  name="password"
-                  required
-                  minLength={MIN_PASSWORD_LENGTH}
-                  autoComplete="new-password"
-                />
-              </label>
-              <div className="flex items-end sm:col-span-2 lg:col-span-3">
-                <button type="submit" className="btn-primary">
-                  Create user
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
+        <AddUserPanel defaultOpen={openForm} />
 
         <div className="box">
           <div className="box-header">All Users</div>

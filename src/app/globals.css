@@ -103,7 +103,8 @@ a:hover {
   font-weight: 400;
 }
 
-.add-item-toggle {
+.add-item-toggle,
+.collapse-form-toggle {
   display: flex;
   width: 100%;
   align-items: center;
@@ -116,11 +117,13 @@ a:hover {
   text-align: left;
 }
 
-.add-item-toggle:hover {
+.add-item-toggle:hover,
+.collapse-form-toggle:hover {
   background: #fafafa;
 }
 
-.box:has(> .add-item-toggle:not([aria-expanded="true"])) .add-item-toggle {
+.box:has(> .add-item-toggle:not([aria-expanded="true"])) .add-item-toggle,
+.box:has(> .collapse-form-toggle:not([aria-expanded="true"])) .collapse-form-toggle {
   border-bottom: 0;
 }
 
