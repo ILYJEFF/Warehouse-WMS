@@ -103,6 +103,27 @@ a:hover {
   font-weight: 400;
 }
 
+.add-item-toggle {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+}
+
+.add-item-toggle:hover {
+  background: #fafafa;
+}
+
+.box:has(> .add-item-toggle:not([aria-expanded="true"])) .add-item-toggle {
+  border-bottom: 0;
+}
+
 .box-body {
   padding: 10px;
 }
