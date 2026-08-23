@@ -26,6 +26,12 @@ enum MoveType {
   TRANSFER
 }
 
+enum CycleCountStatus {
+  OPEN
+  POSTED
+  CANCELLED
+}
+
 model User {
   id                String     @id @default(cuid())
   email             String     @unique
@@ -40,6 +46,8 @@ model User {
   updatedAt         DateTime   @updatedAt
   moves             StockMove[]
   assignedTrucks    Location[] @relation("TruckAssignment")
+  cycleCountsCreated CycleCount[] @relation("CycleCountCreatedBy")
+  cycleCountsPosted  CycleCount[] @relation("CycleCountPostedBy")
 }
 
 model Item {
@@ -57,9 +65,10 @@ model Item {
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
   vendor        Vendor?        @relation(fields: [vendorId], references: [id], onDelete: SetNull)
-  balances      StockBalance[]
-  moves         StockMove[]
-  itemTags      ItemTag[]
+  balances         StockBalance[]
+  moves            StockMove[]
+  itemTags         ItemTag[]
+  cycleCountLines  CycleCountLine[]
 
   @@index([vendorId])
 }
@@ -115,6 +124,7 @@ model Location {
   balances       StockBalance[]
   movesFrom      StockMove[]    @relation("MoveFrom")
   movesTo        StockMove[]    @relation("MoveTo")
+  cycleCounts    CycleCount[]
 
   @@index([assignedUserId])
   @@index([licensePlate])
@@ -167,4 +177,41 @@ model IntegrationConnection {
   updatedAt    DateTime  @updatedAt
   lastSyncAt   DateTime?
   metadata     Json?
+}
+
+model CycleCount {
+  id          String           @id @default(cuid())
+  locationId  String
+  status      CycleCountStatus @default(OPEN)
+  blind       Boolean          @default(false)
+  note        String?
+  createdById String?
+  postedById  String?
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  postedAt    DateTime?
+  location    Location         @relation(fields: [locationId], references: [id])
+  createdBy   User?            @relation("CycleCountCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+  postedBy    User?            @relation("CycleCountPostedBy", fields: [postedById], references: [id], onDelete: SetNull)
+  lines       CycleCountLine[]
+
+  @@index([locationId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model CycleCountLine {
+  id           String     @id @default(cuid())
+  cycleCountId String
+  itemId       String
+  expectedQty  Int        @default(0)
+  countedQty   Int?
+  note         String?
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  cycleCount   CycleCount @relation(fields: [cycleCountId], references: [id], onDelete: Cascade)
+  item         Item       @relation(fields: [itemId], references: [id])
+
+  @@unique([cycleCountId, itemId])
+  @@index([itemId])
 }

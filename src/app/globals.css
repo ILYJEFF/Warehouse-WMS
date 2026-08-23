@@ -1379,6 +1379,235 @@ table.data tbody tr.row-link:hover td:not(:has(form)) {
   font-size: 13px;
 }
 
+.cc-workspace {
+  padding: 0.85rem 1rem 1rem;
+}
+
+.cc-progress-card {
+  margin-bottom: 0.85rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid #dce6ee;
+  border-radius: 3px;
+  background:
+    linear-gradient(180deg, #f8fbfe 0%, #ffffff 70%),
+    radial-gradient(circle at top right, rgb(60 141 188 / 10%), transparent 45%);
+}
+
+.cc-progress-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.cc-progress-label {
+  margin: 0;
+  color: #7a8690;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.cc-progress-value {
+  margin: 0.15rem 0 0;
+  color: #2c3b45;
+  font-size: 1.55rem;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.cc-progress-value span {
+  color: #8a949c;
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+.cc-stat-row {
+  display: flex;
+  gap: 1.25rem;
+}
+
+.cc-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  min-width: 3.25rem;
+}
+
+.cc-stat-num {
+  color: #2c3b45;
+  font-size: 1.1rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.cc-stat-label {
+  margin-top: 0.2rem;
+  color: #8a949c;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.cc-progress-track {
+  height: 6px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #e6eef4;
+}
+
+.cc-progress-fill {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #3c8dbc, #5fa8d3);
+  transition: width 220ms ease;
+}
+
+.cc-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.cc-filter {
+  width: min(100%, 22rem);
+  border: 1px solid #d2d6de;
+  border-radius: 3px;
+  padding: 0.45rem 0.7rem;
+  color: #444;
+  font-size: 14px;
+  outline: none;
+  background: #fff;
+}
+
+.cc-filter:focus {
+  border-color: #3c8dbc;
+  box-shadow: 0 0 0 2px rgb(60 141 188 / 18%);
+}
+
+.cc-saving {
+  color: #8a949c;
+  font-size: 12px;
+}
+
+.cc-table .cc-row.is-counted td {
+  background: #f7fbf8;
+}
+
+.cc-qty-form {
+  display: inline-flex;
+  justify-content: flex-end;
+}
+
+.cc-qty-input {
+  width: 5.25rem;
+  border: 1px solid #d2d6de;
+  border-radius: 3px;
+  padding: 0.4rem 0.5rem;
+  color: #333;
+  font-size: 15px;
+  font-weight: 700;
+  text-align: right;
+  outline: none;
+  background: #fff;
+}
+
+.cc-qty-input:focus {
+  border-color: #3c8dbc;
+  box-shadow: 0 0 0 2px rgb(60 141 188 / 18%);
+}
+
+.cc-var {
+  display: inline-flex;
+  min-width: 4.25rem;
+  justify-content: center;
+  border-radius: 2px;
+  padding: 0.15rem 0.45rem;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.cc-var.is-pending {
+  background: #f4f4f4;
+  color: #888;
+}
+
+.cc-var.is-match {
+  background: #dff0d8;
+  color: #3c763d;
+}
+
+.cc-var.is-short {
+  background: #f2dede;
+  color: #a94442;
+}
+
+.cc-var.is-over {
+  background: #fcf8e3;
+  color: #8a6d3b;
+}
+
+.cc-row-actions {
+  display: inline-flex;
+  gap: 0.65rem;
+  justify-content: flex-end;
+}
+
+.cc-link-btn {
+  border: 0;
+  background: transparent;
+  color: #3c8dbc;
+  font-size: 12px;
+  cursor: pointer;
+  padding: 0;
+}
+
+.cc-link-btn:hover {
+  text-decoration: underline;
+}
+
+.cc-link-btn.is-danger {
+  color: #dd4b39;
+}
+
+.cc-banner {
+  border-radius: 3px;
+  padding: 0.75rem 1rem;
+  font-size: 14px;
+}
+
+.cc-banner.is-success {
+  border: 1px solid #d6e9c6;
+  background: #dff0d8;
+  color: #3c763d;
+}
+
+.cc-banner.is-muted {
+  border: 1px solid #e0e0e0;
+  background: #f7f7f7;
+  color: #777;
+}
+
+.cc-cancel-btn {
+  border: 1px solid #d2d6de;
+  border-radius: 3px;
+  background: #fff;
+  color: #777;
+  padding: 0.45rem 0.85rem;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.cc-cancel-btn:hover {
+  background: #f7f7f7;
+  color: #dd4b39;
+  border-color: #e4b9b4;
+}
+
 .login-logo {
   display: block;
   width: 72px;

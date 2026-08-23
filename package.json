@@ -15,6 +15,7 @@
     "db:ensure-vendors": "tsx scripts/ensure-vendors.ts",
     "db:ensure-trucks": "tsx scripts/ensure-truck-fields.ts",
     "db:ensure-integrations": "tsx scripts/ensure-integrations.ts",
+    "db:ensure-cycle-counts": "tsx scripts/ensure-cycle-counts.ts",
     "db:studio": "prisma studio",
     "postinstall": "prisma generate"
   },

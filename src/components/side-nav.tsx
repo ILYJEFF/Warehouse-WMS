@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   Boxes,
+  ClipboardCheck,
   ClipboardList,
   LayoutDashboard,
   MapPin,
@@ -22,6 +23,7 @@ const NAV = [
   { href: "/stock", label: "Stock", icon: Warehouse },
   { href: "/receive", label: "Receive", icon: PackagePlus },
   { href: "/pull", label: "Pull to Job", icon: PackageMinus },
+  { href: "/cycle-counts", label: "Cycle Counts", icon: ClipboardCheck },
   { href: "/purchasing", label: "Purchasing", icon: ShoppingCart },
   { href: "/top-skus", label: "Top 100 SKUs", icon: Trophy },
   { href: "/moves", label: "Recent Activity", icon: ClipboardList },

@@ -1,5 +1,5 @@
 {
-  "buildCommand": "prisma generate && tsx scripts/ensure-item-tags.ts && tsx scripts/ensure-user-activity.ts && tsx scripts/ensure-vendors.ts && tsx scripts/ensure-truck-fields.ts && tsx scripts/ensure-integrations.ts && next build",
+  "buildCommand": "prisma generate && tsx scripts/ensure-item-tags.ts && tsx scripts/ensure-user-activity.ts && tsx scripts/ensure-vendors.ts && tsx scripts/ensure-truck-fields.ts && tsx scripts/ensure-integrations.ts && tsx scripts/ensure-cycle-counts.ts && next build",
   "framework": "nextjs",
   "installCommand": "npm install"
 }
