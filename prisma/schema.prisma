@@ -1,0 +1,109 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  OWNER
+  DISPATCH
+  TECH
+}
+
+enum LocationKind {
+  SHOP
+  TRUCK
+  OTHER
+}
+
+enum MoveType {
+  RECEIVE
+  PULL
+  ADJUST
+  TRANSFER
+}
+
+model User {
+  id             String     @id @default(cuid())
+  email          String     @unique
+  name           String
+  passwordHash   String
+  role           Role       @default(TECH)
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+  moves          StockMove[]
+  assignedTrucks Location[] @relation("TruckAssignment")
+}
+
+model Item {
+  id           String         @id @default(cuid())
+  sku          String         @unique
+  name         String
+  category     String         @default("General")
+  unit         String         @default("ea")
+  reorderPoint Int            @default(0)
+  unitCostCents Int           @default(0)
+  notes        String?
+  active       Boolean        @default(true)
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  balances     StockBalance[]
+  moves        StockMove[]
+}
+
+model Location {
+  id             String         @id @default(cuid())
+  code           String         @unique
+  name           String
+  kind           LocationKind   @default(SHOP)
+  parentId       String?
+  parent         Location?      @relation("LocationTree", fields: [parentId], references: [id])
+  children       Location[]     @relation("LocationTree")
+  assignedUserId String?
+  assignedUser   User?          @relation("TruckAssignment", fields: [assignedUserId], references: [id], onDelete: SetNull)
+  active         Boolean        @default(true)
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  balances       StockBalance[]
+  movesFrom      StockMove[]    @relation("MoveFrom")
+  movesTo        StockMove[]    @relation("MoveTo")
+
+  @@index([assignedUserId])
+}
+
+model StockBalance {
+  id         String   @id @default(cuid())
+  itemId     String
+  locationId String
+  qty        Int      @default(0)
+  updatedAt  DateTime @updatedAt
+  item       Item     @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  location   Location @relation(fields: [locationId], references: [id], onDelete: Cascade)
+
+  @@unique([itemId, locationId])
+  @@index([locationId])
+}
+
+model StockMove {
+  id           String    @id @default(cuid())
+  type         MoveType
+  itemId       String
+  qty          Int
+  fromLocationId String?
+  toLocationId   String?
+  jobRef       String?
+  note         String?
+  userId       String?
+  createdAt    DateTime  @default(now())
+  item         Item      @relation(fields: [itemId], references: [id])
+  fromLocation Location? @relation("MoveFrom", fields: [fromLocationId], references: [id])
+  toLocation   Location? @relation("MoveTo", fields: [toLocationId], references: [id])
+  user         User?     @relation(fields: [userId], references: [id])
+
+  @@index([createdAt])
+  @@index([itemId])
+  @@index([jobRef])
+}

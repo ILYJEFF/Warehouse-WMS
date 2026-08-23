@@ -1,0 +1,30 @@
+# Techchefs WMS Postgres (NAS only)
+# LAN: 192.168.0.24:5435
+# App DATABASE_URL example:
+#   postgresql://wms:Oatmilk1769!@192.168.0.24:5435/wms
+# Port 5435 avoids Line CRM Postgres (often 5432/5433).
+# Do not expose this port to the public internet.
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: wms-postgres
+    restart: unless-stopped
+    ports:
+      - "5435:5432"
+    environment:
+      TZ: America/Chicago
+      POSTGRES_USER: wms
+      POSTGRES_PASSWORD: "Oatmilk1769!"
+      POSTGRES_DB: wms
+    volumes:
+      - wms-pgdata:/var/lib/postgresql/data
+    command:
+      - postgres
+      - -c
+      - shared_buffers=256MB
+      - -c
+      - max_connections=100
+
+volumes:
+  wms-pgdata:

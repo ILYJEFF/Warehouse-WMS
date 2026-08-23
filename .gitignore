@@ -1,0 +1,18 @@
+# Env
+.env
+.env.local
+.env*.local
+
+# Next / Node
+node_modules
+.next
+out
+dist
+
+# Prisma
+prisma/*.db
+prisma/*.db-journal
+
+# OS / IDE
+.DS_Store
+*.log
