@@ -1,11 +1,12 @@
 import Link from "next/link";
-import { Search, User } from "lucide-react";
+import { User } from "lucide-react";
 import { logoutAction } from "@/lib/actions/auth";
 import type { SessionUser } from "@/lib/auth";
 import { isAdmin, roleLabel } from "@/lib/auth";
+import { ActivityTracker } from "@/components/activity-tracker";
+import { HeaderSkuSearch } from "@/components/header-sku-search";
 import { MobileNav } from "@/components/mobile-nav";
 import { SideNav } from "@/components/side-nav";
-import { ActivityTracker } from "@/components/activity-tracker";
 
 export function AppShell({
   user,
@@ -34,17 +35,7 @@ export function AppShell({
           </Link>
         </div>
         <div className="hidden min-w-0 flex-1 justify-center px-4 md:flex lg:px-8">
-          <div className="header-search">
-            <input
-              className="header-search-input"
-              placeholder="Lookup by SKU"
-              readOnly
-              aria-label="Lookup by SKU"
-            />
-            <button type="button" className="header-search-btn" aria-label="Search">
-              <Search className="h-4 w-4" />
-            </button>
-          </div>
+          <HeaderSkuSearch />
         </div>
         <div className="flex shrink-0 items-center gap-2">
           <span className="hidden items-center gap-2 text-sm sm:flex">
