@@ -7,7 +7,6 @@ import {
   MIN_PASSWORD_LENGTH,
   requireUser,
   roleLabel,
-  toAppRole,
 } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
@@ -51,12 +50,12 @@ export default async function UsersPage({
       </div>
       <section className="content">
         {params.created ? (
-          <div className="mb-3 rounded-lg bg-[#dff0d8] px-3 py-3 text-sm text-[#3c763d]">
+          <div className="mb-4 rounded bg-[#dff0d8] px-3 py-2 text-sm text-[#3c763d]">
             User created.
           </div>
         ) : null}
         {errorMessage ? (
-          <div className="mb-3 rounded-lg bg-[#f2dede] px-3 py-3 text-sm text-[#a94442]">
+          <div className="mb-4 rounded bg-[#f2dede] px-3 py-2 text-sm text-[#a94442]">
             {errorMessage}
           </div>
         ) : null}
@@ -104,7 +103,7 @@ export default async function UsersPage({
                 />
               </label>
               <div className="flex items-end sm:col-span-2 lg:col-span-3">
-                <button type="submit" className="btn-primary btn-block-mobile lg:w-auto">
+                <button type="submit" className="btn-primary">
                   Create user
                 </button>
               </div>
@@ -115,34 +114,7 @@ export default async function UsersPage({
         <div className="box">
           <div className="box-header">All Users</div>
           <div className="box-body p-0">
-            <div className="mobile-only mobile-card-list">
-              {users.map((user) => (
-                <Link
-                  key={user.id}
-                  href={`/users/${user.id}`}
-                  className="mobile-user-card"
-                >
-                  <div className="mobile-user-card-top">
-                    <div>
-                      <p className="mobile-user-card-name">{user.name}</p>
-                      <p className="mobile-user-card-email">{user.email}</p>
-                    </div>
-                  </div>
-                  <div className="mobile-user-card-meta">
-                    <span
-                      className={
-                        isAdmin(user.role) ? "chip chip-ok" : "chip chip-muted"
-                      }
-                    >
-                      {roleLabel(user.role)}
-                    </span>
-                  </div>
-                  <div className="mobile-user-card-action">Edit user</div>
-                </Link>
-              ))}
-            </div>
-
-            <div className="table-wrap table-desktop-only">
+            <div className="table-wrap">
               <table className="data">
                 <thead>
                   <tr>

@@ -3,7 +3,6 @@ import { Search, User } from "lucide-react";
 import { logoutAction } from "@/lib/actions/auth";
 import type { SessionUser } from "@/lib/auth";
 import { isAdmin, roleLabel } from "@/lib/auth";
-import { MobileChrome } from "@/components/mobile-chrome";
 import { SideNav } from "@/components/side-nav";
 
 export function AppShell({
@@ -17,15 +16,8 @@ export function AppShell({
   const label = roleLabel(user.role);
 
   return (
-    <div className="app-shell min-h-screen">
-      <MobileChrome
-        showAdmin={admin}
-        userName={user.name}
-        roleLabel={label}
-        logout={logoutAction}
-      />
-
-      <header className="desktop-topbar hidden lg:flex">
+    <div className="min-h-screen">
+      <header className="flex h-[50px] items-center justify-between bg-[#3c8dbc] px-4 text-white shadow-sm">
         <div className="flex items-center gap-3">
           <Link
             href="/"
@@ -54,7 +46,7 @@ export function AppShell({
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <span className="flex items-center gap-2 text-sm">
+          <span className="hidden items-center gap-2 text-sm sm:flex">
             <User className="h-4 w-4" />
             {user.name}
             <span className="rounded-sm bg-white/15 px-1.5 py-0.5 text-[11px] uppercase tracking-wide">
@@ -72,15 +64,15 @@ export function AppShell({
         </div>
       </header>
 
-      <div className="flex min-h-[calc(100vh-50px)]">
-        <aside className="hidden w-[230px] shrink-0 bg-[#222d32] lg:block">
-          <div className="border-b border-[#1a2226] px-4 py-3">
+      <div className="flex min-h-[calc(100vh-50px)] flex-col lg:flex-row">
+        <aside className="w-full shrink-0 bg-[#222d32] lg:w-[230px]">
+          <div className="hidden border-b border-[#1a2226] px-4 py-3 lg:block">
             <p className="truncate text-xs text-[#4b646f]">MAIN NAVIGATION</p>
           </div>
           <SideNav showAdmin={admin} />
         </aside>
 
-        <div className="app-main min-w-0 flex-1 bg-[#ecf0f5]">{children}</div>
+        <div className="min-w-0 flex-1 bg-[#ecf0f5]">{children}</div>
       </div>
     </div>
   );

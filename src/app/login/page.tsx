@@ -98,7 +98,7 @@ export default async function LoginPage({
               ) : null}
               <button
                 type="submit"
-                className="btn-primary btn-block-mobile w-full"
+                className="btn-primary w-full"
                 disabled={!dbStatus.ok}
               >
                 {firstRun ? "Create admin" : "Sign In"}

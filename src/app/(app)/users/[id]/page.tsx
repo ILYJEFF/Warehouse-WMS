@@ -49,19 +49,19 @@ export default async function EditUserPage({
         <h1>Edit User</h1>
       </div>
       <section className="content">
-        <p className="mb-3 text-sm text-[#777]">
-          <Link href="/users" className="inline-flex min-h-11 items-center text-[#3c8dbc]">
+        <p className="mb-4 text-sm text-[#777]">
+          <Link href="/users" className="text-[#3c8dbc]">
             Back to users
           </Link>
         </p>
 
         {query.saved ? (
-          <div className="mb-3 rounded-lg bg-[#dff0d8] px-3 py-3 text-sm text-[#3c763d]">
+          <div className="mb-4 rounded bg-[#dff0d8] px-3 py-2 text-sm text-[#3c763d]">
             Changes saved.
           </div>
         ) : null}
         {errorMessage ? (
-          <div className="mb-3 rounded-lg bg-[#f2dede] px-3 py-3 text-sm text-[#a94442]">
+          <div className="mb-4 rounded bg-[#f2dede] px-3 py-2 text-sm text-[#a94442]">
             {errorMessage}
           </div>
         ) : null}
@@ -72,7 +72,7 @@ export default async function EditUserPage({
             <span className="chip chip-muted">{roleLabel(user.role)}</span>
           </div>
           <div className="box-body">
-            <form action={updateUser} className="grid gap-3 sm:grid-cols-2">
+            <form action={updateUser} className="grid max-w-2xl gap-3 sm:grid-cols-2">
               <input type="hidden" name="id" value={user.id} />
               <label className="block">
                 <span className="field-label">Name</span>
@@ -116,13 +116,13 @@ export default async function EditUserPage({
                   placeholder={`Optional, min ${MIN_PASSWORD_LENGTH} characters`}
                 />
               </label>
-              <div className="flex flex-col gap-2 sm:col-span-2 sm:flex-row">
-                <button type="submit" className="btn-primary btn-block-mobile sm:w-auto">
+              <div className="flex gap-2 sm:col-span-2">
+                <button type="submit" className="btn-primary">
                   Save changes
                 </button>
                 <Link
                   href="/users"
-                  className="btn-ghost btn-block-mobile no-underline sm:w-auto"
+                  className="btn-ghost no-underline"
                 >
                   Cancel
                 </Link>

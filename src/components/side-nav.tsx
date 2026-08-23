@@ -30,7 +30,7 @@ export function SideNav({ showAdmin = false }: { showAdmin?: boolean }) {
   const items = showAdmin ? [...NAV, ...ADMIN_NAV] : [...NAV];
 
   return (
-    <ul className="m-0 list-none p-0">
+    <ul className="side-nav m-0 list-none p-0">
       {items.map((item) => {
         const active =
           item.href === "/"
@@ -41,14 +41,12 @@ export function SideNav({ showAdmin = false }: { showAdmin?: boolean }) {
           <li key={item.href}>
             <Link
               href={item.href}
-              className={`flex items-center gap-3 border-l-[3px] px-[15px] py-3 text-sm transition ${
-                active
-                  ? "border-l-[#3c8dbc] bg-[#1a2226] text-white"
-                  : "border-l-transparent text-[#b8c7ce] hover:bg-[#1e282c] hover:text-white"
+              className={`side-nav-link flex items-center gap-3 border-l-[3px] px-[15px] py-3 text-sm transition ${
+                active ? "is-active" : ""
               }`}
             >
               <Icon className="h-4 w-4 shrink-0 opacity-80" />
-              <span>{item.label}</span>
+              <span className="whitespace-nowrap">{item.label}</span>
             </Link>
           </li>
         );
