@@ -1,17 +1,85 @@
 # Put WMS on your NAS (simple version)
 
-You have **two different machines** and **two different `.env` files**. That is what has been confusing.
+## UGREEN Docker **Project** (what you are using)
 
-| Where | What it runs | Which `.env` |
-|---|---|---|
-| **Your PC** | `npm run dev` while coding | `wms/.env` (you already have this) |
-| **NAS** | Docker (database + website) | `wms/.env` **on the NAS** (copy from `env.nas.example`) |
+You are not missing something obvious. The Docker Project UI does **not** read the `.env` on your PC.
 
-Do not use your PC `.env` on the NAS. Docker on the NAS needs `POSTGRES_PASSWORD`, which your PC file does not have.
+In a **Project**, you either:
+- put a `.env` file in the project folder on the NAS, **or**
+- type the variables into the Project **Environment** / **Env** screen
+
+That is why you saw `POSTGRES_PASSWORD is missing`.
+
+### Step 1: Project folder on the NAS
+
+The project path must be the **whole** GitHub repo (not just the yaml), because the app has to **build** from source.
+
+Example path: `/volume1/docker/Warehouse-WMS`
+
+Clone once (File Manager SSH, or git on NAS):
+
+```bash
+git clone https://github.com/ILYJEFF/Warehouse-WMS.git /volume1/docker/Warehouse-WMS
+```
+
+### Step 2: Create / edit the Docker Project
+
+1. Open **Docker** → **Project** → **Create** (or edit your existing project)
+2. **Path:** `/volume1/docker/Warehouse-WMS` (folder that contains `docker-compose.yml` + `Dockerfile`)
+3. **Compose file:** `docker-compose.yml` (the one in that repo, not Line CRM)
+
+### Step 3: Add environment variables (required)
+
+In the Project **Environment variables** section, add **every** line below (name = value):
+
+```
+POSTGRES_USER=wms
+POSTGRES_PASSWORD=Oatmilk1769!
+POSTGRES_DB=wms
+AUTH_SECRET=techchefs-wms-change-me-to-32chars-min
+APP_URL=https://warehouse.techchefstx.work
+ADMIN_EMAIL=dispatch@techchefstx.com
+ADMIN_PASSWORD=Oatmilk1769!
+ADMIN_NAME=Dispatch
+SEED_DEMO=true
+```
+
+**Alternative:** create a file named `.env` in `/volume1/docker/Warehouse-WMS/` with those same lines (copy from `env.nas.example`). Some UGREEN versions pick that up automatically.
+
+### Step 4: Deploy
+
+Click **Deploy** / **Build and start**. First run can take several minutes (`wms-app` is building).
+
+When healthy you should see two containers:
+- `wms-postgres`
+- `wms-app`
+
+LAN test: **http://192.168.0.24:3090**
+
+Login: `dispatch@techchefstx.com` / `Oatmilk1769!`
+
+### Step 5: Cloudflare (separate from Docker Project)
+
+Your tunnel is **not** part of this compose file.
+
+Cloudflare Zero Trust → Tunnels → your tunnel → Public hostname:
+
+- `warehouse.techchefstx.work` → `http://192.168.0.24:3090`
 
 ---
 
-## Step 1: Get the code on the NAS
+## PC vs NAS (still the confusing part)
+
+| | Your PC | NAS Docker Project |
+|---|---|---|
+| **Purpose** | Coding (`npm run dev`) | Live site |
+| **Config** | `wms/.env` on PC | Env vars **in the Project UI** (or `.env` on NAS) |
+| **Needs POSTGRES_PASSWORD?** | No | **Yes** |
+
+---
+
+## SSH version (if you prefer terminal)
+
 
 Clone or copy the repo folder to the NAS, e.g. `/volume1/docker/wms/`
 
