@@ -1,5 +1,6 @@
 import { assignTruckPerson } from "@/lib/actions/stock";
 import { AddLocationPanel } from "@/components/add-location-panel";
+import { parseTruckNumber } from "@/lib/locations";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 
@@ -19,13 +20,20 @@ export default async function LocationsPage() {
     }),
   ]);
 
+  let nextTruckNumber = 1;
+  for (const loc of locations) {
+    if (loc.kind !== "TRUCK") continue;
+    const n = parseTruckNumber(loc.code);
+    if (n !== null) nextTruckNumber = Math.max(nextTruckNumber, n + 1);
+  }
+
   return (
     <>
       <div className="content-header">
         <h1>Locations</h1>
       </div>
       <section className="content">
-        <AddLocationPanel users={users} />
+        <AddLocationPanel users={users} nextTruckNumber={nextTruckNumber} />
 
         <div className="box">
           <div className="box-header">Location List</div>
@@ -37,6 +45,7 @@ export default async function LocationsPage() {
                     <th>Code</th>
                     <th>Name</th>
                     <th>Kind</th>
+                    <th>Plate / VIN</th>
                     <th>Assigned to</th>
                     <th>Stock rows</th>
                   </tr>
@@ -56,6 +65,22 @@ export default async function LocationsPage() {
                       </td>
                       <td>
                         <span className="chip chip-muted">{loc.kind}</span>
+                      </td>
+                      <td>
+                        {loc.kind === "TRUCK" ? (
+                          <div>
+                            <div className="font-mono text-sm">
+                              {loc.licensePlate || "—"}
+                            </div>
+                            {loc.vin ? (
+                              <div className="text-xs text-[#999] font-mono">{loc.vin}</div>
+                            ) : (
+                              <div className="text-xs text-[#999]">No VIN</div>
+                            )}
+                          </div>
+                        ) : (
+                          <span className="text-muted">-</span>
+                        )}
                       </td>
                       <td>
                         {loc.kind === "TRUCK" ? (
