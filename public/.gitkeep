@@ -1,0 +1,1 @@
+# Keep empty public/ so Docker COPY never fails

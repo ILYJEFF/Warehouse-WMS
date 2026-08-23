@@ -1,10 +1,11 @@
-# Techchefs WMS Postgres (NAS only)
-# LAN: 192.168.0.24:5435
-# Copy .env.example to .env next to this file (or set env vars in Container Manager).
-# App DATABASE_URL example:
-#   postgresql://wms:YOUR_PASSWORD@192.168.0.24:5435/wms
-# Port 5435 avoids Line CRM Postgres (often 5432/5433).
-# Do not expose this port to the public internet.
+# Techchefs WMS — NAS deploy (Postgres + app)
+# Copy this folder to the NAS, then:
+#   1. cp .env.docker.example .env
+#   2. Edit POSTGRES_PASSWORD, AUTH_SECRET, ADMIN_PASSWORD
+#   3. docker compose up -d --build
+#
+# LAN:  http://192.168.0.24:3090
+# DB:   192.168.0.24:5435  (LAN only — do not tunnel Postgres)
 
 services:
   db:
@@ -16,16 +17,43 @@ services:
     environment:
       TZ: America/Chicago
       POSTGRES_USER: ${POSTGRES_USER:-wms}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
       POSTGRES_DB: ${POSTGRES_DB:-wms}
     volumes:
       - wms-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-wms} -d ${POSTGRES_DB:-wms}"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
     command:
       - postgres
       - -c
       - shared_buffers=256MB
       - -c
       - max_connections=100
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: techchefs-wms:latest
+    container_name: wms-app
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "3090:3090"
+    environment:
+      TZ: America/Chicago
+      DATABASE_URL: postgresql://${POSTGRES_USER:-wms}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-wms}
+      AUTH_SECRET: ${AUTH_SECRET:?Set AUTH_SECRET in .env}
+      APP_URL: ${APP_URL:-http://192.168.0.24:3090}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-dispatch@techchefstx.com}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:?Set ADMIN_PASSWORD in .env}
+      ADMIN_NAME: ${ADMIN_NAME:-Dispatch}
+      SEED_DEMO: ${SEED_DEMO:-true}
 
 volumes:
   wms-pgdata:
