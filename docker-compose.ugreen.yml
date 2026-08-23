@@ -1,0 +1,55 @@
+# UGREEN Docker Project — paste THIS whole file, no .env needed
+# Public: https://warehouse.techchefstx.work  (point Cloudflare tunnel at http://192.168.0.24:3090)
+# LAN:    http://192.168.0.24:3090
+# Login:  dispatch@techchefstx.com / Oatmilk1769!
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: wms-postgres
+    restart: unless-stopped
+    ports:
+      - "5435:5432"
+    environment:
+      TZ: America/Chicago
+      POSTGRES_USER: wms
+      POSTGRES_PASSWORD: "Oatmilk1769!"
+      POSTGRES_DB: wms
+    volumes:
+      - wms-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U wms -d wms"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    command:
+      - postgres
+      - -c
+      - shared_buffers=256MB
+      - -c
+      - max_connections=100
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: techchefs-wms:latest
+    container_name: wms-app
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "3090:3090"
+    environment:
+      TZ: America/Chicago
+      DATABASE_URL: postgresql://wms:Oatmilk1769!@db:5432/wms
+      AUTH_SECRET: techchefs-wms-change-me-to-32chars-min
+      APP_URL: https://warehouse.techchefstx.work
+      ADMIN_EMAIL: dispatch@techchefstx.com
+      ADMIN_PASSWORD: "Oatmilk1769!"
+      ADMIN_NAME: Dispatch
+      SEED_DEMO: "true"
+
+volumes:
+  wms-pgdata:
