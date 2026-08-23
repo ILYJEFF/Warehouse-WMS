@@ -20,7 +20,7 @@ export function AppShell({
   return (
     <div className="min-h-screen">
       <ActivityTracker />
-      <header className="flex h-[58px] items-center justify-between gap-4 bg-[#3c8dbc] px-4 text-white shadow-sm">
+      <header className="flex h-[50px] items-center justify-between gap-4 bg-[#3c8dbc] px-4 text-white shadow-sm">
         <div className="flex min-w-0 items-center gap-2 sm:gap-3">
           <MobileNav showAdmin={admin} userName={user.name} roleLabel={label} />
           <Link
@@ -42,7 +42,7 @@ export function AppShell({
               aria-label="Lookup by SKU"
             />
             <button type="button" className="header-search-btn" aria-label="Search">
-              <Search className="h-5 w-5" />
+              <Search className="h-4 w-4" />
             </button>
           </div>
         </div>
@@ -57,7 +57,7 @@ export function AppShell({
           <form action={logoutAction} className="hidden sm:block">
             <button
               type="submit"
-              className="rounded-sm border border-white/30 bg-white/10 px-3 py-1.5 text-xs text-white hover:bg-white/20"
+              className="rounded-sm border border-white/30 bg-white/10 px-3 py-1 text-xs text-white hover:bg-white/20"
             >
               Sign out
             </button>
@@ -65,7 +65,7 @@ export function AppShell({
         </div>
       </header>
 
-      <div className="flex min-h-[calc(100vh-58px)]">
+      <div className="flex min-h-[calc(100vh-50px)]">
         <aside className="hidden w-[230px] shrink-0 bg-[#222d32] lg:block">
           <div className="border-b border-[#1a2226] px-4 py-3">
             <p className="truncate text-xs text-[#4b646f]">MAIN NAVIGATION</p>
