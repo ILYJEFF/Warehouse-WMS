@@ -646,7 +646,6 @@ table.data tbody tr.row-link:hover td:not(:has(form)) {
 }
 
 .mobile-nav-toggle {
-  display: inline-flex;
   height: 36px;
   width: 36px;
   flex-shrink: 0;
@@ -657,6 +656,18 @@ table.data tbody tr.row-link:hover td:not(:has(form)) {
   background: rgb(255 255 255 / 14%);
   color: #fff;
   cursor: pointer;
+}
+
+@media (max-width: 1023px) {
+  .mobile-nav-toggle {
+    display: inline-flex;
+  }
+}
+
+@media (min-width: 1024px) {
+  .mobile-nav-toggle {
+    display: none !important;
+  }
 }
 
 .mobile-nav-toggle:hover {
