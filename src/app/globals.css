@@ -740,3 +740,11 @@ table.data tbody tr.row-link:hover td:not(:has(form)) {
   flex-direction: column;
   background: var(--bg);
 }
+
+.login-logo {
+  display: block;
+  width: 72px;
+  height: 72px;
+  border-radius: 16px;
+  box-shadow: 0 6px 18px rgb(60 141 188 / 28%);
+}

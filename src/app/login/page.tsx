@@ -38,72 +38,84 @@ export default async function LoginPage({
         Techchefs WMS
       </header>
       <div className="flex flex-1 justify-center px-3 py-6 sm:px-4 sm:py-10">
-        <div className="box box-primary w-full max-w-md self-start">
-          <div className="box-body p-5 sm:p-6">
-            <p className="m-0 text-center text-lg">
-              {firstRun ? "Create the first admin account" : "Sign in to start your session"}
-            </p>
-            {!dbStatus.ok ? (
-              <div className="mt-4 rounded-lg bg-[#fcf8e3] px-3 py-3 text-sm text-[#8a6d3b]">
-                <p className="m-0 font-semibold">Database not configured</p>
-                <p className="mt-2 mb-0">{dbStatus.message}</p>
-                <p className="mt-2 mb-0 text-xs">
-                  On Vercel: add DATABASE_URL (cloud Postgres, not your NAS IP), AUTH_SECRET,
-                  and APP_URL, then redeploy.
-                </p>
-              </div>
-            ) : null}
-            {errorMessage ? (
-              <p className="mt-4 rounded-lg bg-[#f2dede] px-3 py-3 text-center text-sm text-[#a94442]">
-                {errorMessage}
+        <div className="w-full max-w-md self-start">
+          <div className="mb-5 flex flex-col items-center text-center">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/logo.svg"
+              alt="Techchefs WMS"
+              width={72}
+              height={72}
+              className="login-logo"
+            />
+          </div>
+          <div className="box box-primary">
+            <div className="box-body p-5 sm:p-6">
+              <p className="m-0 text-center text-lg">
+                {firstRun ? "Create the first admin account" : "Sign in to start your session"}
               </p>
-            ) : null}
-            <form action={loginAction} className="mt-6 space-y-4">
-              <input type="hidden" name="next" value={next} />
-              {firstRun ? (
-                <label className="block">
-                  <span className="field-label">Name</span>
-                  <input className="field" name="name" defaultValue="Admin" required />
-                </label>
+              {!dbStatus.ok ? (
+                <div className="mt-4 rounded-lg bg-[#fcf8e3] px-3 py-3 text-sm text-[#8a6d3b]">
+                  <p className="m-0 font-semibold">Database not configured</p>
+                  <p className="mt-2 mb-0">{dbStatus.message}</p>
+                  <p className="mt-2 mb-0 text-xs">
+                    On Vercel: add DATABASE_URL (cloud Postgres, not your NAS IP), AUTH_SECRET,
+                    and APP_URL, then redeploy.
+                  </p>
+                </div>
               ) : null}
-              <label className="block">
-                <span className="field-label">Email</span>
-                <input
-                  className="field"
-                  type="email"
-                  name="email"
-                  required
-                  autoComplete="username"
-                  inputMode="email"
-                  disabled={!dbStatus.ok}
-                />
-              </label>
-              <label className="block">
-                <span className="field-label">Password</span>
-                <input
-                  className="field"
-                  type="password"
-                  name="password"
-                  required
-                  minLength={MIN_PASSWORD_LENGTH}
-                  autoComplete={firstRun ? "new-password" : "current-password"}
-                  disabled={!dbStatus.ok}
-                />
-              </label>
-              {firstRun ? (
-                <p className="m-0 text-xs text-[#777]">
-                  First account is always an Admin. Minimum {MIN_PASSWORD_LENGTH} character
-                  password.
+              {errorMessage ? (
+                <p className="mt-4 rounded-lg bg-[#f2dede] px-3 py-3 text-center text-sm text-[#a94442]">
+                  {errorMessage}
                 </p>
               ) : null}
-              <button
-                type="submit"
-                className="btn-primary w-full"
-                disabled={!dbStatus.ok}
-              >
-                {firstRun ? "Create admin" : "Sign In"}
-              </button>
-            </form>
+              <form action={loginAction} className="mt-6 space-y-4">
+                <input type="hidden" name="next" value={next} />
+                {firstRun ? (
+                  <label className="block">
+                    <span className="field-label">Name</span>
+                    <input className="field" name="name" defaultValue="Admin" required />
+                  </label>
+                ) : null}
+                <label className="block">
+                  <span className="field-label">Email</span>
+                  <input
+                    className="field"
+                    type="email"
+                    name="email"
+                    required
+                    autoComplete="username"
+                    inputMode="email"
+                    disabled={!dbStatus.ok}
+                  />
+                </label>
+                <label className="block">
+                  <span className="field-label">Password</span>
+                  <input
+                    className="field"
+                    type="password"
+                    name="password"
+                    required
+                    minLength={MIN_PASSWORD_LENGTH}
+                    autoComplete={firstRun ? "new-password" : "current-password"}
+                    disabled={!dbStatus.ok}
+                  />
+                </label>
+                {firstRun ? (
+                  <p className="m-0 text-xs text-[#777]">
+                    First account is always an Admin. Minimum {MIN_PASSWORD_LENGTH} character
+                    password.
+                  </p>
+                ) : null}
+                <button
+                  type="submit"
+                  className="btn-primary w-full"
+                  disabled={!dbStatus.ok}
+                >
+                  {firstRun ? "Create admin" : "Sign In"}
+                </button>
+              </form>
+            </div>
           </div>
         </div>
       </div>
