@@ -1,6 +1,8 @@
-# UGREEN — paste this in Docker Project. No Dockerfile on NAS needed.
-# Image is built by GitHub Actions and pulled automatically.
-#
+# ============================================================
+# USE THIS FILE on UGREEN — pulls image, NO Dockerfile needed
+# Do NOT use docker-compose.ugreen.build.yml unless you copied
+# the whole repo folder to the NAS.
+# ============================================================
 # Public: https://warehouse.techchefstx.work  →  Cloudflare tunnel → http://192.168.0.24:3090
 # LAN:    http://192.168.0.24:3090
 # Login:  dispatch@techchefstx.com / Oatmilk1769!

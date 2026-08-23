@@ -1,11 +1,14 @@
 FROM node:22-alpine AS deps
 WORKDIR /app
 COPY package.json package-lock.json ./
+COPY prisma ./prisma
 RUN npm ci
 
 FROM node:22-alpine AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
+COPY --from=deps /app/prisma ./prisma
+COPY package.json package-lock.json ./
 COPY . .
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV DATABASE_URL="postgresql://wms:wms@localhost:5432/wms"
@@ -28,7 +31,7 @@ COPY --from=builder /app/next.config.ts ./next.config.ts
 COPY --from=builder /app/scripts ./scripts
 COPY --from=builder /app/tsconfig.json ./tsconfig.json
 
-RUN mkdir -p public && npx prisma generate
+RUN npx prisma generate
 
 EXPOSE 3090
 CMD ["node", "scripts/entrypoint.mjs"]

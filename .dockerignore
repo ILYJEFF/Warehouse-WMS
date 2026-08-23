@@ -1,0 +1,11 @@
+node_modules
+.next
+.git
+.env
+.env.*
+*.log
+AGENTS.md
+CLAUDE.md
+NAS-SETUP.md
+UGREEN.md
+copy-to-nas.ps1
