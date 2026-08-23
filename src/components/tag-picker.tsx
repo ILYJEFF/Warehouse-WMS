@@ -165,7 +165,6 @@ export function TagPicker({ catalog, initialSelected = [] }: TagPickerProps) {
               <ColorPalettePicker
                 value={newColor}
                 onChange={setNewColor}
-                compact
               />
               <button
                 type="button"

@@ -21,7 +21,10 @@ export function TagsManager({ tags }: { tags: TagRow[] }) {
       <div className="box box-primary">
         <div className="box-header">Add tag</div>
         <div className="box-body">
-          <form action={createTag} className="grid gap-4 lg:grid-cols-[1fr_280px_auto] lg:items-start">
+          <form
+            action={createTag}
+            className="grid gap-3 sm:grid-cols-[1fr_auto_auto] sm:items-end"
+          >
             <label className="block">
               <span className="field-label">Name</span>
               <input
@@ -39,7 +42,7 @@ export function TagsManager({ tags }: { tags: TagRow[] }) {
                 <ColorPalettePicker value={createColor} onChange={setCreateColor} />
               </div>
             </div>
-            <button type="submit" className="btn-primary lg:mt-6">
+            <button type="submit" className="btn-primary">
               Create tag
             </button>
           </form>
@@ -143,7 +146,10 @@ function EditTagRow({
   const [color, setColor] = useState(tag.color);
 
   return (
-    <form action={updateTag} className="grid gap-3 py-2 lg:grid-cols-[1fr_280px_auto] lg:items-start">
+    <form
+      action={updateTag}
+      className="grid gap-3 py-2 sm:grid-cols-[1fr_auto_auto] sm:items-end"
+    >
       <input type="hidden" name="id" value={tag.id} />
       <input type="hidden" name="color" value={color} />
       <label className="block min-w-0">
@@ -162,7 +168,7 @@ function EditTagRow({
           <ColorPalettePicker value={color} onChange={setColor} />
         </div>
       </div>
-      <div className="flex gap-2 lg:mt-6">
+      <div className="flex gap-2">
         <button type="submit" className="btn-primary">
           Save
         </button>

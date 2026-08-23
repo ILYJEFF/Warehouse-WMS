@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
+import { ChevronDown } from "lucide-react";
 import { TAG_COLOR_PRESETS, tagTextColor } from "@/lib/tags";
 
 /** Dense digital palette squares (presets + extras). */
@@ -113,24 +114,21 @@ function normalizeHex(raw: string) {
 type ColorPalettePickerProps = {
   value: string;
   onChange: (hex: string) => void;
-  /** Compact layout for inline item tag create. */
-  compact?: boolean;
 };
 
-export function ColorPalettePicker({
-  value,
-  onChange,
-  compact = false,
-}: ColorPalettePickerProps) {
+export function ColorPalettePicker({ value, onChange }: ColorPalettePickerProps) {
+  const [open, setOpen] = useState(false);
   const [hsv, setHsv] = useState(() => hexToHsv(value || TAG_COLOR_PRESETS[0]));
   const [hexDraft, setHexDraft] = useState(
     () => (normalizeHex(value) || TAG_COLOR_PRESETS[0]).toLowerCase(),
   );
+  const rootRef = useRef<HTMLDivElement>(null);
   const hsvRef = useRef(hsv);
   const onChangeRef = useRef(onChange);
   const svRef = useRef<HTMLDivElement>(null);
   const hueRef = useRef<HTMLDivElement>(null);
   const dragging = useRef<"sv" | "hue" | null>(null);
+  const panelId = useId();
 
   hsvRef.current = hsv;
   onChangeRef.current = onChange;
@@ -150,6 +148,28 @@ export function ColorPalettePicker({
     setHsv(hexToHsv(next));
     setHexDraft(next);
   }, [value]);
+
+  useEffect(() => {
+    if (!open) return;
+
+    function onPointerDown(e: PointerEvent) {
+      if (dragging.current) return;
+      const root = rootRef.current;
+      if (!root || root.contains(e.target as Node)) return;
+      setOpen(false);
+    }
+
+    function onKeyDown(e: KeyboardEvent) {
+      if (e.key === "Escape") setOpen(false);
+    }
+
+    window.addEventListener("pointerdown", onPointerDown);
+    window.addEventListener("keydown", onKeyDown);
+    return () => {
+      window.removeEventListener("pointerdown", onPointerDown);
+      window.removeEventListener("keydown", onKeyDown);
+    };
+  }, [open]);
 
   function commit(next: Hsv) {
     hsvRef.current = next;
@@ -206,100 +226,134 @@ export function ColorPalettePicker({
   }, []);
 
   return (
-    <div className={`color-palette ${compact ? "is-compact" : ""}`}>
-      <div className="color-palette-preview-row">
-        <span
-          className="color-palette-preview"
-          style={{ background: hex, color: tagTextColor(hex) }}
-          title={hex}
-        >
-          Aa
-        </span>
-        <label className="color-palette-hex">
-          <span className="sr-only">Hex color</span>
-          <input
-            className="field color-palette-hex-input"
-            value={hexDraft}
-            onChange={(e) => setHexDraft(e.target.value)}
-            onBlur={applyHexDraft}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                e.preventDefault();
-                applyHexDraft();
-              }
-            }}
-            spellCheck={false}
-            autoComplete="off"
-          />
-        </label>
-      </div>
-
-      <div
-        className="color-palette-squares"
-        role="listbox"
-        aria-label="Color palette"
+    <div className="color-palette" ref={rootRef}>
+      <button
+        type="button"
+        className={`color-palette-trigger ${open ? "is-open" : ""}`}
+        aria-expanded={open}
+        aria-controls={panelId}
+        onClick={() => setOpen((value) => !value)}
       >
-        {COLOR_PALETTE_SQUARES.map((color) => {
-          const active = color.toLowerCase() === hex;
-          return (
+        <span
+          className="color-palette-trigger-swatch"
+          style={{ background: hex }}
+          aria-hidden
+        />
+        <span className="color-palette-trigger-hex">{hex}</span>
+        <ChevronDown
+          className={`color-palette-trigger-chevron h-4 w-4 ${open ? "is-open" : ""}`}
+        />
+      </button>
+
+      {open ? (
+        <div
+          id={panelId}
+          className="color-palette-popout"
+          role="dialog"
+          aria-label="Choose color"
+        >
+          <div className="color-palette-preview-row">
+            <span
+              className="color-palette-preview"
+              style={{ background: hex, color: tagTextColor(hex) }}
+              title={hex}
+            >
+              Aa
+            </span>
+            <label className="color-palette-hex">
+              <span className="sr-only">Hex color</span>
+              <input
+                className="field color-palette-hex-input"
+                value={hexDraft}
+                onChange={(e) => setHexDraft(e.target.value)}
+                onBlur={applyHexDraft}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    applyHexDraft();
+                  }
+                }}
+                spellCheck={false}
+                autoComplete="off"
+              />
+            </label>
             <button
-              key={color}
               type="button"
-              role="option"
-              aria-selected={active}
-              className={`color-palette-square ${active ? "is-active" : ""} ${
-                color.toLowerCase() === "#ffffff" ? "is-light" : ""
-              }`}
-              style={{ background: color }}
-              aria-label={`Color ${color}`}
-              onMouseDown={(e) => e.preventDefault()}
-              onClick={() => pickPreset(color)}
-            />
-          );
-        })}
-      </div>
+              className="btn-primary btn-sm"
+              onClick={() => setOpen(false)}
+            >
+              Done
+            </button>
+          </div>
 
-      <div className="color-palette-gradient-block">
-        <div
-          ref={svRef}
-          className="color-palette-sv"
-          style={{
-            background: `
-              linear-gradient(to top, #000, transparent),
-              linear-gradient(to right, #fff, ${hueColor})
-            `,
-          }}
-          onPointerDown={(e) => {
-            e.preventDefault();
-            dragging.current = "sv";
-            readSv(e.clientX, e.clientY);
-          }}
-        >
-          <span
-            className="color-palette-sv-knob"
-            style={{
-              left: `${hsv.s * 100}%`,
-              top: `${(1 - hsv.v) * 100}%`,
-              background: hex,
-            }}
-          />
-        </div>
+          <div
+            className="color-palette-squares"
+            role="listbox"
+            aria-label="Color palette"
+          >
+            {COLOR_PALETTE_SQUARES.map((color) => {
+              const active = color.toLowerCase() === hex;
+              return (
+                <button
+                  key={color}
+                  type="button"
+                  role="option"
+                  aria-selected={active}
+                  className={`color-palette-square ${active ? "is-active" : ""} ${
+                    color.toLowerCase() === "#ffffff" ? "is-light" : ""
+                  }`}
+                  style={{ background: color }}
+                  aria-label={`Color ${color}`}
+                  onMouseDown={(e) => e.preventDefault()}
+                  onClick={() => pickPreset(color)}
+                />
+              );
+            })}
+          </div>
 
-        <div
-          ref={hueRef}
-          className="color-palette-hue"
-          onPointerDown={(e) => {
-            e.preventDefault();
-            dragging.current = "hue";
-            readHue(e.clientX);
-          }}
-        >
-          <span
-            className="color-palette-hue-knob"
-            style={{ left: `${(hsv.h / 360) * 100}%` }}
-          />
+          <div className="color-palette-gradient-block">
+            <div
+              ref={svRef}
+              className="color-palette-sv"
+              style={{
+                background: `
+                  linear-gradient(to top, #000, transparent),
+                  linear-gradient(to right, #fff, ${hueColor})
+                `,
+              }}
+              onPointerDown={(e) => {
+                e.preventDefault();
+                dragging.current = "sv";
+                readSv(e.clientX, e.clientY);
+              }}
+            >
+              <span
+                className="color-palette-sv-knob"
+                style={{
+                  left: `${hsv.s * 100}%`,
+                  top: `${(1 - hsv.v) * 100}%`,
+                  background: hex,
+                }}
+              />
+            </div>
+
+            <div
+              ref={hueRef}
+              className="color-palette-hue"
+              onPointerDown={(e) => {
+                e.preventDefault();
+                dragging.current = "hue";
+                readHue(e.clientX);
+              }}
+            >
+              <span
+                className="color-palette-hue-knob"
+                style={{ left: `${(hsv.h / 360) * 100}%` }}
+              />
+            </div>
+          </div>
         </div>
-      </div>
+      ) : null}
     </div>
   );
 }
