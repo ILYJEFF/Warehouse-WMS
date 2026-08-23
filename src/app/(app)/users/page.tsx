@@ -62,6 +62,11 @@ export default async function UsersPage({
         <h1>Users</h1>
       </div>
       <section className="content">
+        <p className="mb-4 text-sm text-[#777]">
+          <Link href="/settings" className="text-[#3c8dbc]">
+            Back to settings
+          </Link>
+        </p>
         {params.created ? (
           <div className="mb-4 rounded bg-[#dff0d8] px-3 py-2 text-sm text-[#3c763d]">
             User created.

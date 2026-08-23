@@ -7,6 +7,7 @@ import {
   clearSession,
   createPending2fa,
   createSession,
+  hasTrusted2fa,
   hashPassword,
   requireUser,
   safeRedirectPath,
@@ -62,6 +63,25 @@ export async function loginAction(formData: FormData) {
   }
 
   if (user.twoFactorRequired) {
+    if (
+      user.totpConfirmed &&
+      user.totpSecret &&
+      (await hasTrusted2fa(user.id, user.totpSecret))
+    ) {
+      await createSession({
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        role: toAppRole(user.role),
+      });
+      await clearPending2fa();
+      await prisma.user.update({
+        where: { id: user.id },
+        data: { lastLoginAt: new Date() },
+      });
+      redirect(next);
+    }
+
     await clearSession();
     await createPending2fa(user.id, next);
     if (!user.totpConfirmed || !user.totpSecret) {

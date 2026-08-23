@@ -49,6 +49,7 @@ export default async function TwoFactorVerifyPage({
               <p className="mt-2 mb-0 text-center text-sm text-[#777]">
                 Enter the 6-digit code from your authenticator app for{" "}
                 <span className="font-medium text-[#333]">{user.email}</span>.
+                This browser will be trusted for 7 days.
               </p>
 
               {params.error === "code" ? (

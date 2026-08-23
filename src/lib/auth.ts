@@ -6,10 +6,19 @@ import {
   MIN_PASSWORD_LENGTH,
   PENDING_2FA_COOKIE,
   SESSION_COOKIE,
+  TRUSTED_2FA_COOKIE,
+  TRUSTED_2FA_DAYS,
 } from "@/lib/auth-constants";
 import { prisma } from "@/lib/prisma";
+import { secretFingerprint } from "@/lib/totp";
 
-export { MIN_PASSWORD_LENGTH, PENDING_2FA_COOKIE, SESSION_COOKIE };
+export {
+  MIN_PASSWORD_LENGTH,
+  PENDING_2FA_COOKIE,
+  SESSION_COOKIE,
+  TRUSTED_2FA_COOKIE,
+  TRUSTED_2FA_DAYS,
+};
 
 export type AppRole = "ADMIN" | "USER";
 
@@ -141,6 +150,55 @@ export async function readPending2fa(): Promise<{
     };
   } catch {
     return null;
+  }
+}
+
+/** Remember this browser so 2FA is skipped for TRUSTED_2FA_DAYS. */
+export async function createTrusted2fa(userId: string, totpSecret: string) {
+  const maxAge = 60 * 60 * 24 * TRUSTED_2FA_DAYS;
+  const token = await new SignJWT({
+    purpose: "2fa-trust",
+    fp: secretFingerprint(totpSecret),
+  })
+    .setProtectedHeader({ alg: "HS256" })
+    .setSubject(userId)
+    .setIssuedAt()
+    .setExpirationTime(`${TRUSTED_2FA_DAYS}d`)
+    .sign(secret());
+
+  const jar = await cookies();
+  jar.set(TRUSTED_2FA_COOKIE, token, {
+    httpOnly: true,
+    sameSite: "lax",
+    secure: cookieSecure(),
+    path: "/",
+    maxAge,
+  });
+}
+
+export async function clearTrusted2fa() {
+  const jar = await cookies();
+  jar.delete(TRUSTED_2FA_COOKIE);
+}
+
+/** True when this browser already passed 2FA for this user recently. */
+export async function hasTrusted2fa(userId: string, totpSecret: string) {
+  const jar = await cookies();
+  const token = jar.get(TRUSTED_2FA_COOKIE)?.value;
+  if (!token) return false;
+
+  try {
+    const { payload } = await jwtVerify(token, secret());
+    if (
+      payload.sub !== userId ||
+      payload.purpose !== "2fa-trust" ||
+      typeof payload.fp !== "string"
+    ) {
+      return false;
+    }
+    return payload.fp === secretFingerprint(totpSecret);
+  } catch {
+    return false;
   }
 }
 

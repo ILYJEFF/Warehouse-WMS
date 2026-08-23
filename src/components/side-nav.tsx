@@ -9,7 +9,7 @@ import {
   MapPin,
   PackageMinus,
   PackagePlus,
-  Users,
+  Settings,
   Warehouse,
 } from "lucide-react";
 
@@ -23,15 +23,20 @@ const NAV = [
   { href: "/moves", label: "Recent Activity", icon: ClipboardList },
 ] as const;
 
-const ADMIN_NAV = [{ href: "/users", label: "Users", icon: Users }] as const;
+const SETTINGS_HREFS = ["/settings", "/users", "/tags"] as const;
+
+function isSettingsPath(pathname: string) {
+  return SETTINGS_HREFS.some(
+    (href) => pathname === href || pathname.startsWith(`${href}/`),
+  );
+}
 
 export function SideNav({ showAdmin = false }: { showAdmin?: boolean }) {
   const pathname = usePathname();
-  const items = showAdmin ? [...NAV, ...ADMIN_NAV] : [...NAV];
 
   return (
     <ul className="side-nav m-0 list-none p-0">
-      {items.map((item) => {
+      {NAV.map((item) => {
         const active =
           item.href === "/"
             ? pathname === "/"
@@ -51,6 +56,25 @@ export function SideNav({ showAdmin = false }: { showAdmin?: boolean }) {
           </li>
         );
       })}
+
+      {showAdmin ? (
+        <>
+          <li className="side-nav-section" aria-hidden="true">
+            Settings
+          </li>
+          <li>
+            <Link
+              href="/settings"
+              className={`side-nav-link flex items-center gap-3 border-l-[3px] px-[15px] py-3 text-sm transition ${
+                isSettingsPath(pathname) ? "is-active" : ""
+              }`}
+            >
+              <Settings className="h-4 w-4 shrink-0 opacity-80" />
+              <span className="whitespace-nowrap">Settings</span>
+            </Link>
+          </li>
+        </>
+      ) : null}
     </ul>
   );
 }

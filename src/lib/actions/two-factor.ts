@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import {
   clearPending2fa,
   createSession,
+  createTrusted2fa,
   readPending2fa,
   toAppRole,
 } from "@/lib/auth";
@@ -31,6 +32,7 @@ async function finishLogin(
     role: string;
   },
   next: string,
+  totpSecret: string,
 ) {
   await createSession({
     id: user.id,
@@ -38,6 +40,7 @@ async function finishLogin(
     name: user.name,
     role: toAppRole(user.role),
   });
+  await createTrusted2fa(user.id, totpSecret);
   await clearPending2fa();
   await prisma.user.update({
     where: { id: user.id },
@@ -74,7 +77,7 @@ export async function confirmTotpSetupAction(formData: FormData) {
     data: { totpConfirmed: true, totpSecret: secret },
   });
 
-  await finishLogin(user, pending.next);
+  await finishLogin(user, pending.next, secret);
 }
 
 export async function verifyTotpLoginAction(formData: FormData) {
@@ -91,7 +94,7 @@ export async function verifyTotpLoginAction(formData: FormData) {
     );
   }
 
-  await finishLogin(user, pending.next);
+  await finishLogin(user, pending.next, user.totpSecret);
 }
 
 export async function cancelTotpAction() {

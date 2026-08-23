@@ -645,6 +645,101 @@ table.data tbody tr.row-link:hover td:not(:has(form)) {
   color: #fff;
 }
 
+.side-nav-section {
+  margin: 14px 0 4px;
+  padding: 8px 15px 4px;
+  color: #4b646f;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.settings-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 640px) {
+  .settings-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.settings-tile {
+  --tile-accent: #3c8dbc;
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1.25rem 1.35rem;
+  border: 1px solid #d2d6de;
+  border-left: 4px solid var(--tile-accent);
+  border-radius: 3px;
+  background: #fff;
+  color: inherit;
+  text-decoration: none;
+  box-shadow: 0 1px 1px rgb(0 0 0 / 5%);
+  transition:
+    border-color 160ms ease,
+    box-shadow 160ms ease,
+    transform 160ms ease;
+}
+
+.settings-tile:hover {
+  border-color: #c8ccd4;
+  box-shadow: 0 8px 22px rgb(34 45 50 / 10%);
+  color: inherit;
+  text-decoration: none;
+  transform: translateY(-2px);
+}
+
+.settings-tile-icon {
+  display: flex;
+  height: 2.75rem;
+  width: 2.75rem;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border-radius: 3px;
+  background: color-mix(in srgb, var(--tile-accent) 14%, white);
+  color: var(--tile-accent);
+}
+
+.settings-tile-body {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.settings-tile-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #444;
+}
+
+.settings-tile-desc {
+  font-size: 0.875rem;
+  line-height: 1.45;
+  color: #777;
+}
+
+.settings-tile-arrow {
+  margin-top: 0.35rem;
+  flex-shrink: 0;
+  color: #bbb;
+  transition:
+    color 160ms ease,
+    transform 160ms ease;
+}
+
+.settings-tile:hover .settings-tile-arrow {
+  color: var(--tile-accent);
+  transform: translateX(3px);
+}
+
 .mobile-nav-toggle {
   height: 36px;
   width: 36px;

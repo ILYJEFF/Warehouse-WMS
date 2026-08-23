@@ -66,7 +66,7 @@ export default async function TwoFactorSetupPage({
               <p className="m-0 text-center text-lg">Set up authenticator</p>
               <p className="mt-2 mb-0 text-center text-sm text-[#777]">
                 Scan this QR code with Google Authenticator, Authy, or 1Password,
-                then enter the 6-digit code.
+                then enter the 6-digit code. This browser will be trusted for 7 days.
               </p>
 
               {params.error === "code" ? (
