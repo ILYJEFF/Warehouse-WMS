@@ -2,40 +2,28 @@
 
 Public URL: **https://warehouse.techchefstx.work**
 
-## If cloudflared runs in `docker-compose.yml` (recommended)
+## Option A: cloudflared already on the NAS (most common)
 
-1. Open **Cloudflare Zero Trust** → **Networks** → **Tunnels**.
-2. Create a tunnel (or reuse your existing one after removing old routes).
-3. On **Public Hostname**, add:
-   - **Subdomain:** `warehouse`
-   - **Domain:** `techchefstx.work`
-   - **Service type:** HTTP
-   - **URL:** `http://app:3090`
-4. Copy the **tunnel token** into `.env` as `TUNNEL_TOKEN`.
-5. Remove old hostname routes that pointed at OpenBoxes/Sentry (ports 8080, 8090).
-6. From the WMS folder on the NAS:
+1. **Do not** use the tunnel profile. Just run:
 
 ```bash
-cp .env.docker.example .env
-# edit passwords + TUNNEL_TOKEN
 docker compose up -d --build
 ```
 
-## If cloudflared already runs on the NAS (outside Docker)
+2. In **Cloudflare Zero Trust** → **Tunnels** → your tunnel → **Public Hostname**:
+   - `warehouse.techchefstx.work` → `http://192.168.0.24:3090`
 
-Skip the `tunnel` service or comment it out, then point your existing tunnel at:
+No `TUNNEL_TOKEN` needed in `.env`.
 
-```text
-http://127.0.0.1:3090
+## Option B: run cloudflared inside this compose stack
+
+1. Add `TUNNEL_TOKEN` to `.env` (from Cloudflare tunnel install command).
+2. Set public hostname service URL to `http://app:3090`.
+3. Start with the tunnel profile:
+
+```bash
+docker compose --profile tunnel up -d --build
 ```
-
-or
-
-```text
-http://192.168.0.24:3090
-```
-
-Keep `APP_URL=https://warehouse.techchefstx.work` in `.env`.
 
 ## Security
 

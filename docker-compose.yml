@@ -4,11 +4,13 @@
 #
 # Setup:
 #   1. cp .env.docker.example .env
-#   2. Set POSTGRES_PASSWORD, AUTH_SECRET, ADMIN_PASSWORD, TUNNEL_TOKEN
-#   3. In Cloudflare Zero Trust → your tunnel → Public Hostname:
-#        warehouse.techchefstx.work  →  http://app:3090
-#      (Use http://app:3090 when cloudflared runs in this compose stack.)
-#   4. docker compose up -d --build
+#   2. Set POSTGRES_PASSWORD, AUTH_SECRET, ADMIN_PASSWORD in .env
+#   3. Cloudflare (pick one):
+#        A) Tunnel already on NAS → point warehouse.techchefstx.work at http://192.168.0.24:3090
+#        B) Run tunnel in compose → set TUNNEL_TOKEN, then:
+#             docker compose --profile tunnel up -d --build
+#   4. Default (app + db only):
+#        docker compose up -d --build
 #
 # Postgres stays on LAN port 5435 only. Never tunnel the database.
 
@@ -61,12 +63,13 @@ services:
       SEED_DEMO: ${SEED_DEMO:-true}
 
   tunnel:
+    profiles: ["tunnel"]
     image: cloudflare/cloudflared:latest
     container_name: wms-tunnel
     restart: unless-stopped
     command: tunnel run
     environment:
-      TUNNEL_TOKEN: ${TUNNEL_TOKEN:?Set TUNNEL_TOKEN in .env}
+      TUNNEL_TOKEN: ${TUNNEL_TOKEN:?Set TUNNEL_TOKEN in .env when using --profile tunnel}
     depends_on:
       - app
 
