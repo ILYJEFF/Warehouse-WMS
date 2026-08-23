@@ -142,8 +142,9 @@ export default async function DashboardPage() {
               </div>
             )}
           </div>
-          <div className="box-footer">
-            <Link href="/moves">View All</Link>
+          <div className="box-footer flex flex-wrap gap-4">
+            <Link href="/moves">View All Activity</Link>
+            <Link href="/top-skus">Top 100 SKUs</Link>
           </div>
         </div>
 

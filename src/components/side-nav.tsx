@@ -10,6 +10,7 @@ import {
   PackageMinus,
   PackagePlus,
   Settings,
+  Trophy,
   Warehouse,
 } from "lucide-react";
 
@@ -20,6 +21,7 @@ const NAV = [
   { href: "/stock", label: "Stock", icon: Warehouse },
   { href: "/receive", label: "Receive", icon: PackagePlus },
   { href: "/pull", label: "Pull to Job", icon: PackageMinus },
+  { href: "/top-skus", label: "Top 100 SKUs", icon: Trophy },
   { href: "/moves", label: "Recent Activity", icon: ClipboardList },
 ] as const;
 

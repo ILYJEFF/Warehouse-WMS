@@ -772,6 +772,104 @@ table.data tbody tr:hover td {
   text-decoration: none;
 }
 
+.top-skus-intro {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.top-skus-range {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  padding: 0.2rem;
+  border: 1px solid #d2d6de;
+  border-radius: 3px;
+  background: #fff;
+}
+
+.top-skus-range-btn {
+  padding: 0.4rem 0.75rem;
+  border-radius: 2px;
+  color: #555;
+  font-size: 13px;
+  text-decoration: none;
+  transition: background 120ms ease, color 120ms ease;
+}
+
+.top-skus-range-btn:hover {
+  background: #f4f4f4;
+  color: #333;
+  text-decoration: none;
+}
+
+.top-skus-range-btn.is-active {
+  background: #3c8dbc;
+  color: #fff;
+}
+
+.top-skus-rank {
+  display: inline-flex;
+  min-width: 1.75rem;
+  height: 1.75rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 3px;
+  background: #f4f4f4;
+  color: #555;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.top-skus-rank.is-top-1 {
+  background: #f39c12;
+  color: #fff;
+}
+
+.top-skus-rank.is-top-2 {
+  background: #95a5a6;
+  color: #fff;
+}
+
+.top-skus-rank.is-top-3 {
+  background: #cd7f32;
+  color: #fff;
+}
+
+.top-skus-meter {
+  display: flex;
+  min-width: 8rem;
+  max-width: 14rem;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.top-skus-meter-track {
+  height: 6px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #eef1f4;
+}
+
+.top-skus-meter-fill {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #3c8dbc, #00a65a);
+}
+
+.top-skus-meter-value {
+  font-weight: 600;
+  color: #444;
+  font-variant-numeric: tabular-nums;
+}
+
+.top-skus-table td {
+  vertical-align: middle;
+}
+
 table.data tbody tr.row-link:hover td {
   cursor: pointer;
 }
