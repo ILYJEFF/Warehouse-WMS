@@ -27,15 +27,19 @@ enum MoveType {
 }
 
 model User {
-  id             String     @id @default(cuid())
-  email          String     @unique
-  name           String
-  passwordHash   String
-  role           Role       @default(TECH)
-  createdAt      DateTime   @default(now())
-  updatedAt      DateTime   @updatedAt
-  moves          StockMove[]
-  assignedTrucks Location[] @relation("TruckAssignment")
+  id                String     @id @default(cuid())
+  email             String     @unique
+  name              String
+  passwordHash      String
+  role              Role       @default(TECH)
+  twoFactorRequired Boolean    @default(false)
+  totpSecret        String?
+  totpConfirmed     Boolean    @default(false)
+  lastLoginAt       DateTime?
+  createdAt         DateTime   @default(now())
+  updatedAt         DateTime   @updatedAt
+  moves             StockMove[]
+  assignedTrucks    Location[] @relation("TruckAssignment")
 }
 
 model Item {

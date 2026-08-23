@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { format, formatDistanceToNowStrict } from "date-fns";
 import { AddUserPanel } from "@/components/add-user-panel";
 import {
   isAdmin,
@@ -8,6 +9,14 @@ import {
   roleLabel,
 } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+
+function formatLastLogin(value: Date | null) {
+  if (!value) return { relative: "Never", absolute: "No login recorded" };
+  return {
+    relative: formatDistanceToNowStrict(value, { addSuffix: true }),
+    absolute: format(value, "MMM d, yyyy h:mm a"),
+  };
+}
 
 export default async function UsersPage({
   searchParams,
@@ -28,6 +37,7 @@ export default async function UsersPage({
       name: true,
       email: true,
       role: true,
+      lastLoginAt: true,
       createdAt: true,
       updatedAt: true,
     },
@@ -73,30 +83,38 @@ export default async function UsersPage({
                     <th>Name</th>
                     <th>Email</th>
                     <th>Role</th>
+                    <th>Last login</th>
                     <th />
                   </tr>
                 </thead>
                 <tbody>
-                  {users.map((user) => (
-                    <tr key={user.id}>
-                      <td>{user.name}</td>
-                      <td>{user.email}</td>
-                      <td>
-                        <span
-                          className={
-                            isAdmin(user.role) ? "chip chip-ok" : "chip chip-muted"
-                          }
-                        >
-                          {roleLabel(user.role)}
-                        </span>
-                      </td>
-                      <td>
-                        <Link href={`/users/${user.id}`} className="text-[#3c8dbc]">
-                          Edit
-                        </Link>
-                      </td>
-                    </tr>
-                  ))}
+                  {users.map((user) => {
+                    const last = formatLastLogin(user.lastLoginAt);
+                    return (
+                      <tr key={user.id}>
+                        <td>{user.name}</td>
+                        <td>{user.email}</td>
+                        <td>
+                          <span
+                            className={
+                              isAdmin(user.role) ? "chip chip-ok" : "chip chip-muted"
+                            }
+                          >
+                            {roleLabel(user.role)}
+                          </span>
+                        </td>
+                        <td>
+                          <div>{last.relative}</div>
+                          <div className="text-xs text-muted">{last.absolute}</div>
+                        </td>
+                        <td>
+                          <Link href={`/users/${user.id}`} className="text-[#3c8dbc]">
+                            Edit
+                          </Link>
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>

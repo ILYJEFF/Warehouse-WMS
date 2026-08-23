@@ -5,6 +5,7 @@ import type { SessionUser } from "@/lib/auth";
 import { isAdmin, roleLabel } from "@/lib/auth";
 import { MobileNav } from "@/components/mobile-nav";
 import { SideNav } from "@/components/side-nav";
+import { ActivityTracker } from "@/components/activity-tracker";
 
 export function AppShell({
   user,
@@ -18,6 +19,7 @@ export function AppShell({
 
   return (
     <div className="min-h-screen">
+      <ActivityTracker />
       <header className="flex h-[50px] items-center justify-between bg-[#3c8dbc] px-4 text-white shadow-sm">
         <div className="flex min-w-0 items-center gap-2 sm:gap-3">
           <MobileNav showAdmin={admin} userName={user.name} roleLabel={label} />

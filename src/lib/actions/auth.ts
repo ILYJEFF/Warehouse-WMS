@@ -46,6 +46,10 @@ export async function loginAction(formData: FormData) {
       name: user.name,
       role: "ADMIN",
     });
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { lastLoginAt: new Date() },
+    });
     redirect(next);
   }
 
@@ -59,6 +63,10 @@ export async function loginAction(formData: FormData) {
     email: user.email,
     name: user.name,
     role: toAppRole(user.role),
+  });
+  await prisma.user.update({
+    where: { id: user.id },
+    data: { lastLoginAt: new Date() },
   });
   redirect(next);
 }
