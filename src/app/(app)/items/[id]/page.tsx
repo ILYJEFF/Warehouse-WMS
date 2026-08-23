@@ -3,7 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { updateItem } from "@/lib/actions/stock";
 import { prisma } from "@/lib/prisma";
-import { money, stockChip } from "@/lib/utils";
+import { formatTagsInput, money, stockChip } from "@/lib/utils";
 
 type Props = {
   params: Promise<{ id: string }>;
@@ -100,6 +100,24 @@ export default async function ItemDetailPage({ params, searchParams }: Props) {
                   <dd>{item.unit}</dd>
                 </div>
               </dl>
+              <div className="mt-4">
+                <p className="field-label m-0">Tags</p>
+                {item.tags.length === 0 ? (
+                  <p className="m-0 mt-1 text-muted">None</p>
+                ) : (
+                  <div className="tag-list mt-2">
+                    {item.tags.map((tag) => (
+                      <Link
+                        key={tag}
+                        href={`/items?tag=${encodeURIComponent(tag)}`}
+                        className="tag-chip"
+                      >
+                        {tag}
+                      </Link>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 
@@ -157,6 +175,16 @@ export default async function ItemDetailPage({ params, searchParams }: Props) {
                   min={0}
                   defaultValue={(item.unitCostCents / 100).toFixed(2)}
                 />
+              </label>
+              <label className="sm:col-span-2 lg:col-span-3">
+                <span className="field-label">Tags</span>
+                <input
+                  className="field"
+                  name="tags"
+                  defaultValue={formatTagsInput(item.tags)}
+                  placeholder="conduit, wire, truck-stock"
+                />
+                <span className="field-hint">Comma-separated. Used to filter items later.</span>
               </label>
               <label className="sm:col-span-2 lg:col-span-3">
                 <span className="field-label">Notes</span>

@@ -39,19 +39,20 @@ model User {
 }
 
 model Item {
-  id           String         @id @default(cuid())
-  sku          String         @unique
-  name         String
-  category     String         @default("General")
-  unit         String         @default("ea")
-  reorderPoint Int            @default(0)
-  unitCostCents Int           @default(0)
-  notes        String?
-  active       Boolean        @default(true)
-  createdAt    DateTime       @default(now())
-  updatedAt    DateTime       @updatedAt
-  balances     StockBalance[]
-  moves        StockMove[]
+  id            String         @id @default(cuid())
+  sku           String         @unique
+  name          String
+  category      String         @default("General")
+  unit          String         @default("ea")
+  reorderPoint  Int            @default(0)
+  unitCostCents Int            @default(0)
+  notes         String?
+  tags          String[]       @default([])
+  active        Boolean        @default(true)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  balances      StockBalance[]
+  moves         StockMove[]
 }
 
 model Location {

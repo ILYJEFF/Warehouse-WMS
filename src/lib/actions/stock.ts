@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { LocationKind, MoveType, Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/auth";
+import { parseTags } from "@/lib/utils";
 
 async function authed() {
   const user = await requireUser();
@@ -34,6 +35,7 @@ export async function createItem(formData: FormData) {
       reorderPoint: Math.max(0, parseIntSafe(formData.get("reorderPoint"))),
       unitCostCents: Math.max(0, Math.round(Number(formData.get("unitCost") ?? 0) * 100)),
       notes: String(formData.get("notes") ?? "").trim() || null,
+      tags: parseTags(String(formData.get("tags") ?? "")),
     },
   });
   revalidatePath("/items");
@@ -66,6 +68,7 @@ export async function updateItem(formData: FormData) {
       reorderPoint: Math.max(0, parseIntSafe(formData.get("reorderPoint"))),
       unitCostCents: Math.max(0, Math.round(Number(formData.get("unitCost") ?? 0) * 100)),
       notes: String(formData.get("notes") ?? "").trim() || null,
+      tags: parseTags(String(formData.get("tags") ?? "")),
     },
   });
   revalidatePath("/items");
