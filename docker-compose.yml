@@ -1,7 +1,8 @@
 # Techchefs WMS Postgres (NAS only)
 # LAN: 192.168.0.24:5435
+# Copy .env.example to .env next to this file (or set env vars in Container Manager).
 # App DATABASE_URL example:
-#   postgresql://wms:Oatmilk1769!@192.168.0.24:5435/wms
+#   postgresql://wms:YOUR_PASSWORD@192.168.0.24:5435/wms
 # Port 5435 avoids Line CRM Postgres (often 5432/5433).
 # Do not expose this port to the public internet.
 
@@ -14,9 +15,9 @@ services:
       - "5435:5432"
     environment:
       TZ: America/Chicago
-      POSTGRES_USER: wms
-      POSTGRES_PASSWORD: "Oatmilk1769!"
-      POSTGRES_DB: wms
+      POSTGRES_USER: ${POSTGRES_USER:-wms}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB:-wms}
     volumes:
       - wms-pgdata:/var/lib/postgresql/data
     command:
