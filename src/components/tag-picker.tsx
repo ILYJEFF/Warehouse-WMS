@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { Plus, Search, X } from "lucide-react";
+import { ColorPalettePicker } from "@/components/color-palette-picker";
 import {
   TAG_COLOR_PRESETS,
   normalizeTagName,
@@ -161,19 +162,11 @@ export function TagPicker({ catalog, initialSelected = [] }: TagPickerProps) {
                   {normalizedQuery}
                 </span>
               </div>
-              <div className="tag-color-row">
-                {TAG_COLOR_PRESETS.map((color) => (
-                  <button
-                    key={color}
-                    type="button"
-                    className={`tag-color-swatch ${newColor === color ? "is-active" : ""}`}
-                    style={{ background: color }}
-                    aria-label={`Color ${color}`}
-                    onMouseDown={(e) => e.preventDefault()}
-                    onClick={() => setNewColor(color)}
-                  />
-                ))}
-              </div>
+              <ColorPalettePicker
+                value={newColor}
+                onChange={setNewColor}
+                compact
+              />
               <button
                 type="button"
                 className="btn-primary btn-sm mt-2"

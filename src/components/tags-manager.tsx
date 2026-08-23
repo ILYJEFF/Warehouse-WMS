@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { ColorPalettePicker } from "@/components/color-palette-picker";
 import { TAG_COLOR_PRESETS, tagTextColor } from "@/lib/tags";
 import { createTag, deleteTag, updateTag } from "@/lib/actions/tags";
 
@@ -20,7 +21,7 @@ export function TagsManager({ tags }: { tags: TagRow[] }) {
       <div className="box box-primary">
         <div className="box-header">Add tag</div>
         <div className="box-body">
-          <form action={createTag} className="grid gap-3 sm:grid-cols-[1fr_auto_auto] sm:items-end">
+          <form action={createTag} className="grid gap-4 lg:grid-cols-[1fr_280px_auto] lg:items-start">
             <label className="block">
               <span className="field-label">Name</span>
               <input
@@ -34,20 +35,11 @@ export function TagsManager({ tags }: { tags: TagRow[] }) {
             <div>
               <span className="field-label">Color</span>
               <input type="hidden" name="color" value={createColor} />
-              <div className="tag-color-row mt-1">
-                {TAG_COLOR_PRESETS.map((color) => (
-                  <button
-                    key={color}
-                    type="button"
-                    className={`tag-color-swatch ${createColor === color ? "is-active" : ""}`}
-                    style={{ background: color }}
-                    aria-label={`Color ${color}`}
-                    onClick={() => setCreateColor(color)}
-                  />
-                ))}
+              <div className="mt-1">
+                <ColorPalettePicker value={createColor} onChange={setCreateColor} />
               </div>
             </div>
-            <button type="submit" className="btn-primary">
+            <button type="submit" className="btn-primary lg:mt-6">
               Create tag
             </button>
           </form>
@@ -151,10 +143,10 @@ function EditTagRow({
   const [color, setColor] = useState(tag.color);
 
   return (
-    <form action={updateTag} className="flex flex-col gap-3 py-1 sm:flex-row sm:items-end">
+    <form action={updateTag} className="grid gap-3 py-2 lg:grid-cols-[1fr_280px_auto] lg:items-start">
       <input type="hidden" name="id" value={tag.id} />
       <input type="hidden" name="color" value={color} />
-      <label className="block min-w-0 flex-1">
+      <label className="block min-w-0">
         <span className="field-label">Name</span>
         <input
           className="field"
@@ -166,20 +158,11 @@ function EditTagRow({
       </label>
       <div>
         <span className="field-label">Color</span>
-        <div className="tag-color-row mt-1">
-          {TAG_COLOR_PRESETS.map((preset) => (
-            <button
-              key={preset}
-              type="button"
-              className={`tag-color-swatch ${color === preset ? "is-active" : ""}`}
-              style={{ background: preset }}
-              aria-label={`Color ${preset}`}
-              onClick={() => setColor(preset)}
-            />
-          ))}
+        <div className="mt-1">
+          <ColorPalettePicker value={color} onChange={setColor} />
         </div>
       </div>
-      <div className="flex gap-2">
+      <div className="flex gap-2 lg:mt-6">
         <button type="submit" className="btn-primary">
           Save
         </button>
