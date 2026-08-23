@@ -1,9 +1,5 @@
-# UGREEN — paste this in Docker Project. No Dockerfile on NAS needed.
-# Image is built by GitHub Actions and pulled automatically.
-#
-# Public: https://warehouse.techchefstx.work  →  Cloudflare tunnel → http://192.168.0.24:3090
-# LAN:    http://192.168.0.24:3090
-# Login:  dispatch@techchefstx.com / Oatmilk1769!
+# UGREEN — only if the full repo folder is on the NAS (includes Dockerfile)
+# Project path must be the cloned repo, not an empty folder.
 
 services:
   db:
@@ -32,7 +28,11 @@ services:
       - max_connections=100
 
   app:
-    image: ghcr.io/ilyjeff/warehouse-wms:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: techchefs-wms:latest
+    pull_policy: build
     container_name: wms-app
     restart: unless-stopped
     depends_on:
