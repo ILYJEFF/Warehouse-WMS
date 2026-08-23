@@ -116,6 +116,48 @@ export default async function EditUserPage({
                   placeholder={`Optional, min ${MIN_PASSWORD_LENGTH} characters`}
                 />
               </label>
+
+              <div className="sm:col-span-2 rounded border border-[#ddd] bg-[#fafafa] p-3">
+                <p className="m-0 mb-2 text-sm font-semibold text-[#333]">
+                  Authenticator (2FA)
+                </p>
+                <p className="m-0 mb-3 text-xs text-[#777]">
+                  When required, this user must enter a code from an authenticator
+                  app after password sign-in.
+                </p>
+                <label className="mb-2 flex items-start gap-2 text-sm">
+                  <input
+                    type="checkbox"
+                    name="twoFactorRequired"
+                    value="true"
+                    defaultChecked={user.twoFactorRequired}
+                    className="mt-1"
+                  />
+                  <span>
+                    Require authenticator app
+                    {user.totpConfirmed ? (
+                      <span className="ml-2 chip chip-ok">Enrolled</span>
+                    ) : user.twoFactorRequired ? (
+                      <span className="ml-2 chip chip-muted">Pending setup</span>
+                    ) : null}
+                  </span>
+                </label>
+                {user.totpConfirmed || user.totpSecret ? (
+                  <label className="flex items-start gap-2 text-sm">
+                    <input
+                      type="checkbox"
+                      name="resetTotp"
+                      value="true"
+                      className="mt-1"
+                    />
+                    <span>
+                      Reset authenticator (clears current enrollment; they set up
+                      again on next login)
+                    </span>
+                  </label>
+                ) : null}
+              </div>
+
               <div className="flex gap-2 sm:col-span-2">
                 <button type="submit" className="btn-primary">
                   Save changes

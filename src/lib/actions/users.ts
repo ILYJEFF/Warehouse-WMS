@@ -31,6 +31,9 @@ export async function createUser(formData: FormData) {
   const name = String(formData.get("name") ?? "").trim();
   const password = String(formData.get("password") ?? "");
   const role = parseRole(String(formData.get("role") ?? "USER"));
+  const twoFactorRequired =
+    formData.get("twoFactorRequired") === "on" ||
+    formData.get("twoFactorRequired") === "true";
 
   if (!email || !name) {
     redirect("/users?error=missing");
@@ -52,6 +55,7 @@ export async function createUser(formData: FormData) {
       name,
       role,
       passwordHash: await hashPassword(password),
+      twoFactorRequired,
     },
   });
 
@@ -71,6 +75,11 @@ export async function updateUser(formData: FormData) {
   const role = parseRole(String(formData.get("role") ?? "USER"));
   const nextIsAdmin = isAdmin(role);
   const password = String(formData.get("password") ?? "");
+  const twoFactorRequired =
+    formData.get("twoFactorRequired") === "on" ||
+    formData.get("twoFactorRequired") === "true";
+  const resetTotp =
+    formData.get("resetTotp") === "on" || formData.get("resetTotp") === "true";
 
   if (!id || !email || !name) {
     redirect(`/users/${id || ""}?error=missing`);
@@ -110,13 +119,19 @@ export async function updateUser(formData: FormData) {
     redirect(`/users/${id}?error=self`);
   }
 
+  const clearTotp = resetTotp || !twoFactorRequired;
+
   await prisma.user.update({
     where: { id },
     data: {
       email,
       name,
       role,
+      twoFactorRequired,
       ...(password ? { passwordHash: await hashPassword(password) } : {}),
+      ...(clearTotp
+        ? { totpSecret: null, totpConfirmed: false }
+        : {}),
     },
   });
 

@@ -38,6 +38,8 @@ export default async function UsersPage({
       email: true,
       role: true,
       lastLoginAt: true,
+      twoFactorRequired: true,
+      totpConfirmed: true,
       createdAt: true,
       updatedAt: true,
     },
@@ -83,6 +85,7 @@ export default async function UsersPage({
                     <th>Name</th>
                     <th>Email</th>
                     <th>Role</th>
+                    <th>2FA</th>
                     <th>Last login</th>
                     <th />
                   </tr>
@@ -90,6 +93,11 @@ export default async function UsersPage({
                 <tbody>
                   {users.map((user) => {
                     const last = formatLastLogin(user.lastLoginAt);
+                    const twoFaLabel = !user.twoFactorRequired
+                      ? "Off"
+                      : user.totpConfirmed
+                        ? "On"
+                        : "Pending";
                     return (
                       <tr key={user.id}>
                         <td>{user.name}</td>
@@ -101,6 +109,19 @@ export default async function UsersPage({
                             }
                           >
                             {roleLabel(user.role)}
+                          </span>
+                        </td>
+                        <td>
+                          <span
+                            className={
+                              twoFaLabel === "On"
+                                ? "chip chip-ok"
+                                : twoFaLabel === "Pending"
+                                  ? "chip chip-warn"
+                                  : "chip chip-muted"
+                            }
+                          >
+                            {twoFaLabel}
                           </span>
                         </td>
                         <td>

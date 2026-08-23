@@ -48,6 +48,17 @@ export function AddUserPanel({ defaultOpen = false }: { defaultOpen?: boolean })
             autoComplete="new-password"
           />
         </label>
+        <label className="flex items-start gap-2 text-sm sm:col-span-2 lg:col-span-3">
+          <input
+            type="checkbox"
+            name="twoFactorRequired"
+            value="true"
+            className="mt-1"
+          />
+          <span>
+            Require authenticator app (they set it up on first sign-in)
+          </span>
+        </label>
         <div className="flex items-end sm:col-span-2 lg:col-span-3">
           <button type="submit" className="btn-primary">
             Create user

@@ -44,7 +44,7 @@ export function verifyTotpCode(secretBase32: string, code: string, email = "user
 
 export function maskSecret(secretBase32: string) {
   if (secretBase32.length <= 8) return secretBase32;
-  return `${secretBase32.slice(0, 4)}…${secretBase32.slice(-4)}`;
+  return `${secretBase32.slice(0, 4)}...${secretBase32.slice(-4)}`;
 }
 
 /** Stable fingerprint so we do not log raw secrets. */

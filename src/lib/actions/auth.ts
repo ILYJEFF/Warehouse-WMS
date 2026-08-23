@@ -3,7 +3,9 @@
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import {
+  clearPending2fa,
   clearSession,
+  createPending2fa,
   createSession,
   hashPassword,
   requireUser,
@@ -46,6 +48,7 @@ export async function loginAction(formData: FormData) {
       name: user.name,
       role: "ADMIN",
     });
+    await clearPending2fa();
     await prisma.user.update({
       where: { id: user.id },
       data: { lastLoginAt: new Date() },
@@ -58,12 +61,22 @@ export async function loginAction(formData: FormData) {
     redirect("/login?error=1");
   }
 
+  if (user.twoFactorRequired) {
+    await clearSession();
+    await createPending2fa(user.id, next);
+    if (!user.totpConfirmed || !user.totpSecret) {
+      redirect(`/login/2fa/setup?next=${encodeURIComponent(next)}`);
+    }
+    redirect(`/login/2fa/verify?next=${encodeURIComponent(next)}`);
+  }
+
   await createSession({
     id: user.id,
     email: user.email,
     name: user.name,
     role: toAppRole(user.role),
   });
+  await clearPending2fa();
   await prisma.user.update({
     where: { id: user.id },
     data: { lastLoginAt: new Date() },
@@ -73,6 +86,7 @@ export async function loginAction(formData: FormData) {
 
 export async function logoutAction() {
   await clearSession();
+  await clearPending2fa();
   redirect("/login");
 }
 

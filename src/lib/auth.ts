@@ -2,10 +2,14 @@ import { cookies } from "next/headers";
 import { SignJWT, jwtVerify } from "jose";
 import bcrypt from "bcryptjs";
 import type { Role } from "@prisma/client";
-import { MIN_PASSWORD_LENGTH, SESSION_COOKIE } from "@/lib/auth-constants";
+import {
+  MIN_PASSWORD_LENGTH,
+  PENDING_2FA_COOKIE,
+  SESSION_COOKIE,
+} from "@/lib/auth-constants";
 import { prisma } from "@/lib/prisma";
 
-export { MIN_PASSWORD_LENGTH, SESSION_COOKIE };
+export { MIN_PASSWORD_LENGTH, PENDING_2FA_COOKIE, SESSION_COOKIE };
 
 export type AppRole = "ADMIN" | "USER";
 
@@ -76,7 +80,7 @@ export async function createSession(user: SessionUser) {
   jar.set(SESSION_COOKIE, token, {
     httpOnly: true,
     sameSite: "lax",
-    secure: process.env.APP_URL?.startsWith("https://") ?? false,
+    secure: cookieSecure(),
     path: "/",
     maxAge: 60 * 60 * 24 * 14,
   });
@@ -85,6 +89,59 @@ export async function createSession(user: SessionUser) {
 export async function clearSession() {
   const jar = await cookies();
   jar.delete(SESSION_COOKIE);
+}
+
+function cookieSecure() {
+  return process.env.APP_URL?.startsWith("https://") ?? false;
+}
+
+/** Short-lived proof that password was accepted; full session waits for TOTP. */
+export async function createPending2fa(userId: string, next: string) {
+  const token = await new SignJWT({
+    purpose: "2fa",
+    next: safeRedirectPath(next),
+  })
+    .setProtectedHeader({ alg: "HS256" })
+    .setSubject(userId)
+    .setIssuedAt()
+    .setExpirationTime("10m")
+    .sign(secret());
+
+  const jar = await cookies();
+  jar.set(PENDING_2FA_COOKIE, token, {
+    httpOnly: true,
+    sameSite: "lax",
+    secure: cookieSecure(),
+    path: "/",
+    maxAge: 60 * 10,
+  });
+}
+
+export async function clearPending2fa() {
+  const jar = await cookies();
+  jar.delete(PENDING_2FA_COOKIE);
+}
+
+export async function readPending2fa(): Promise<{
+  userId: string;
+  next: string;
+} | null> {
+  const jar = await cookies();
+  const token = jar.get(PENDING_2FA_COOKIE)?.value;
+  if (!token) return null;
+
+  try {
+    const { payload } = await jwtVerify(token, secret());
+    if (!payload.sub || payload.purpose !== "2fa") return null;
+    return {
+      userId: payload.sub,
+      next: safeRedirectPath(
+        typeof payload.next === "string" ? payload.next : "/",
+      ),
+    };
+  } catch {
+    return null;
+  }
 }
 
 export async function readSession(): Promise<SessionUser | null> {
