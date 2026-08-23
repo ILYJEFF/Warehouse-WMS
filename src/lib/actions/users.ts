@@ -11,7 +11,8 @@ import {
 } from "@/lib/auth";
 
 function parseRole(raw: string): Role {
-  return raw === "ADMIN" ? "ADMIN" : "USER";
+  // Write legacy OWNER/TECH so Neon works before any enum migration.
+  return raw === "ADMIN" ? "OWNER" : "TECH";
 }
 
 async function ensureAdmin() {
@@ -49,7 +50,6 @@ export async function createUser(formData: FormData) {
       email,
       name,
       role,
-      active: true,
       passwordHash: await hashPassword(password),
     },
   });
@@ -68,7 +68,6 @@ export async function updateUser(formData: FormData) {
     .toLowerCase();
   const name = String(formData.get("name") ?? "").trim();
   const role = parseRole(String(formData.get("role") ?? "USER"));
-  const active = String(formData.get("active") ?? "") === "true";
   const password = String(formData.get("password") ?? "");
 
   if (!id || !email || !name) {
@@ -88,17 +87,16 @@ export async function updateUser(formData: FormData) {
     redirect(`/users/${id}?error=exists`);
   }
 
-  if (target.role === "ADMIN" && (role !== "ADMIN" || !active)) {
-    const adminCount = await prisma.user.count({
-      where: { role: "ADMIN", active: true },
+  const targetIsAdmin =
+    target.role === "ADMIN" || target.role === "OWNER" || target.role === "DISPATCH";
+  if (targetIsAdmin && role !== "ADMIN") {
+    const admins = await prisma.user.findMany({
+      where: { role: { in: ["ADMIN", "OWNER", "DISPATCH"] } },
+      select: { id: true },
     });
-    if (adminCount <= 1) {
+    if (admins.length <= 1 && admins[0]?.id === id) {
       redirect(`/users/${id}?error=lastadmin`);
     }
-  }
-
-  if (id === admin.id && !active) {
-    redirect(`/users/${id}?error=self`);
   }
 
   if (password) {
@@ -108,13 +106,17 @@ export async function updateUser(formData: FormData) {
     }
   }
 
+  // Avoid demoting yourself mid-session without another admin path.
+  if (id === admin.id && role !== "ADMIN") {
+    redirect(`/users/${id}?error=self`);
+  }
+
   await prisma.user.update({
     where: { id },
     data: {
       email,
       name,
       role,
-      active,
       ...(password ? { passwordHash: await hashPassword(password) } : {}),
     },
   });

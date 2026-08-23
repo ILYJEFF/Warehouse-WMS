@@ -27,7 +27,6 @@ export default async function LocationDetailPage({ params }: Props) {
       },
     }),
     prisma.user.findMany({
-      where: { active: true },
       orderBy: [{ name: "asc" }],
       select: { id: true, name: true },
     }),

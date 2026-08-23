@@ -7,6 +7,8 @@ import { prisma } from "@/lib/prisma";
 
 export { MIN_PASSWORD_LENGTH, SESSION_COOKIE };
 
+export type AppRole = "ADMIN" | "USER";
+
 function secret() {
   const value = process.env.AUTH_SECRET;
   if (!value || value.length < 16) {
@@ -19,15 +21,20 @@ export type SessionUser = {
   id: string;
   email: string;
   name: string;
-  role: Role;
+  role: AppRole;
 };
 
-export function isAdmin(role: Role) {
-  return role === "ADMIN";
+/** OWNER/DISPATCH kept for older Neon rows; treat as Admin. */
+export function isAdmin(role: Role | AppRole | string) {
+  return role === "ADMIN" || role === "OWNER" || role === "DISPATCH";
 }
 
-export function roleLabel(role: Role) {
-  return role === "ADMIN" ? "Admin" : "User";
+export function toAppRole(role: Role | AppRole | string): AppRole {
+  return isAdmin(role) ? "ADMIN" : "USER";
+}
+
+export function roleLabel(role: Role | AppRole | string) {
+  return isAdmin(role) ? "Admin" : "User";
 }
 
 export function validatePassword(password: string) {
@@ -88,12 +95,11 @@ export async function readSession(): Promise<SessionUser | null> {
   try {
     const { payload } = await jwtVerify(token, secret());
     if (!payload.sub || typeof payload.email !== "string") return null;
-    const role = payload.role === "ADMIN" ? "ADMIN" : "USER";
     return {
       id: payload.sub,
       email: payload.email,
       name: String(payload.name ?? ""),
-      role,
+      role: toAppRole(String(payload.role ?? "USER")),
     };
   } catch {
     return null;
@@ -104,12 +110,12 @@ export async function requireUser() {
   const session = await readSession();
   if (!session) return null;
   const user = await prisma.user.findUnique({ where: { id: session.id } });
-  if (!user || !user.active) return null;
+  if (!user) return null;
   return {
     id: user.id,
     email: user.email,
     name: user.name,
-    role: user.role,
+    role: toAppRole(user.role),
   } satisfies SessionUser;
 }
 

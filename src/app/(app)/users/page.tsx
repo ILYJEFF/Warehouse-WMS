@@ -2,7 +2,13 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Users } from "lucide-react";
 import { createUser } from "@/lib/actions/users";
-import { isAdmin, MIN_PASSWORD_LENGTH, requireUser, roleLabel } from "@/lib/auth";
+import {
+  isAdmin,
+  MIN_PASSWORD_LENGTH,
+  requireUser,
+  roleLabel,
+  toAppRole,
+} from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
 export default async function UsersPage({
@@ -18,13 +24,12 @@ export default async function UsersPage({
 
   const params = await searchParams;
   const users = await prisma.user.findMany({
-    orderBy: [{ role: "asc" }, { name: "asc" }],
+    orderBy: [{ name: "asc" }],
     select: {
       id: true,
       name: true,
       email: true,
       role: true,
-      active: true,
       createdAt: true,
       updatedAt: true,
     },
@@ -126,13 +131,10 @@ export default async function UsersPage({
                   <div className="mobile-user-card-meta">
                     <span
                       className={
-                        user.role === "ADMIN" ? "chip chip-ok" : "chip chip-muted"
+                        isAdmin(user.role) ? "chip chip-ok" : "chip chip-muted"
                       }
                     >
                       {roleLabel(user.role)}
-                    </span>
-                    <span className={user.active ? "chip chip-ok" : "chip chip-warn"}>
-                      {user.active ? "Active" : "Disabled"}
                     </span>
                   </div>
                   <div className="mobile-user-card-action">Edit user</div>
@@ -147,7 +149,6 @@ export default async function UsersPage({
                     <th>Name</th>
                     <th>Email</th>
                     <th>Role</th>
-                    <th>Status</th>
                     <th />
                   </tr>
                 </thead>
@@ -159,15 +160,10 @@ export default async function UsersPage({
                       <td>
                         <span
                           className={
-                            user.role === "ADMIN" ? "chip chip-ok" : "chip chip-muted"
+                            isAdmin(user.role) ? "chip chip-ok" : "chip chip-muted"
                           }
                         >
                           {roleLabel(user.role)}
-                        </span>
-                      </td>
-                      <td>
-                        <span className={user.active ? "chip chip-ok" : "chip chip-warn"}>
-                          {user.active ? "Active" : "Disabled"}
                         </span>
                       </td>
                       <td>

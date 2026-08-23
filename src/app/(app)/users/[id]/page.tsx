@@ -1,7 +1,13 @@
 import Link from "next/link";
 import { redirect, notFound } from "next/navigation";
 import { updateUser } from "@/lib/actions/users";
-import { isAdmin, MIN_PASSWORD_LENGTH, requireUser, roleLabel } from "@/lib/auth";
+import {
+  isAdmin,
+  MIN_PASSWORD_LENGTH,
+  requireUser,
+  roleLabel,
+  toAppRole,
+} from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
 export default async function EditUserPage({
@@ -22,6 +28,8 @@ export default async function EditUserPage({
   const user = await prisma.user.findUnique({ where: { id } });
   if (!user) notFound();
 
+  const appRole = toAppRole(user.role);
+
   const errorMessage =
     query.error === "password"
       ? `Password must be at least ${MIN_PASSWORD_LENGTH} characters.`
@@ -30,9 +38,9 @@ export default async function EditUserPage({
         : query.error === "missing"
           ? "Name and email are required."
           : query.error === "lastadmin"
-            ? "You cannot disable or demote the last admin."
+            ? "You cannot demote the last admin."
             : query.error === "self"
-              ? "You cannot disable your own account."
+              ? "You cannot demote your own account."
               : null;
 
   return (
@@ -88,22 +96,11 @@ export default async function EditUserPage({
                   inputMode="email"
                 />
               </label>
-              <label className="block">
+              <label className="block sm:col-span-2">
                 <span className="field-label">Role</span>
-                <select className="field" name="role" defaultValue={user.role}>
+                <select className="field" name="role" defaultValue={appRole}>
                   <option value="USER">User</option>
                   <option value="ADMIN">Admin</option>
-                </select>
-              </label>
-              <label className="block">
-                <span className="field-label">Status</span>
-                <select
-                  className="field"
-                  name="active"
-                  defaultValue={user.active ? "true" : "false"}
-                >
-                  <option value="true">Active</option>
-                  <option value="false">Disabled</option>
                 </select>
               </label>
               <label className="block sm:col-span-2">

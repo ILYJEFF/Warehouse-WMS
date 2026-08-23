@@ -8,6 +8,7 @@ import {
   hashPassword,
   requireUser,
   safeRedirectPath,
+  toAppRole,
   validatePassword,
   verifyPassword,
 } from "@/lib/auth";
@@ -36,25 +37,20 @@ export async function loginAction(formData: FormData) {
         email,
         name,
         passwordHash: await hashPassword(password),
-        role: "ADMIN",
-        active: true,
+        role: "OWNER",
       },
     });
     await createSession({
       id: user.id,
       email: user.email,
       name: user.name,
-      role: user.role,
+      role: "ADMIN",
     });
     redirect(next);
   }
 
   const user = await prisma.user.findUnique({ where: { email } });
-  if (
-    !user ||
-    !user.active ||
-    !(await verifyPassword(password, user.passwordHash))
-  ) {
+  if (!user || !(await verifyPassword(password, user.passwordHash))) {
     redirect("/login?error=1");
   }
 
@@ -62,7 +58,7 @@ export async function loginAction(formData: FormData) {
     id: user.id,
     email: user.email,
     name: user.name,
-    role: user.role,
+    role: toAppRole(user.role),
   });
   redirect(next);
 }

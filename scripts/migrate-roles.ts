@@ -1,44 +1,24 @@
 /**
- * One-time: map OWNER/DISPATCH/TECH → ADMIN/USER and add User.active.
+ * Optional: normalize legacy OWNER/DISPATCH/TECH to ADMIN/USER.
+ * Safe to skip; the app accepts both sets of roles.
  * Run: npx tsx scripts/migrate-roles.ts
- * Then: npx prisma db push
  */
 import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
 async function main() {
-  await prisma.$executeRawUnsafe(`
-    DO $$
-    BEGIN
-      IF EXISTS (
-        SELECT 1 FROM pg_type t
-        JOIN pg_enum e ON t.oid = e.enumtypid
-        WHERE t.typname = 'Role' AND e.enumlabel = 'OWNER'
-      ) THEN
-        ALTER TYPE "Role" RENAME TO "Role_old";
-        CREATE TYPE "Role" AS ENUM ('ADMIN', 'USER');
-        ALTER TABLE "User" ALTER COLUMN role DROP DEFAULT;
-        ALTER TABLE "User"
-          ALTER COLUMN role TYPE "Role"
-          USING (
-            CASE
-              WHEN role::text IN ('OWNER', 'DISPATCH', 'ADMIN') THEN 'ADMIN'::"Role"
-              ELSE 'USER'::"Role"
-            END
-          );
-        ALTER TABLE "User" ALTER COLUMN role SET DEFAULT 'USER'::"Role";
-        DROP TYPE "Role_old";
-      END IF;
-    END $$;
+  const result = await prisma.$executeRawUnsafe(`
+    UPDATE "User"
+    SET role = CASE
+      WHEN role::text IN ('OWNER', 'DISPATCH') THEN 'ADMIN'::"Role"
+      WHEN role::text = 'TECH' THEN 'USER'::"Role"
+      ELSE role
+    END
+    WHERE role::text IN ('OWNER', 'DISPATCH', 'TECH')
   `);
 
-  await prisma.$executeRawUnsafe(`
-    ALTER TABLE "User"
-    ADD COLUMN IF NOT EXISTS active BOOLEAN NOT NULL DEFAULT true;
-  `);
-
-  console.log("Role migration complete (ADMIN/USER + active).");
+  console.log("Updated legacy roles:", result);
 }
 
 main()
