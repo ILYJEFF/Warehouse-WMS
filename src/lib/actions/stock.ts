@@ -95,6 +95,7 @@ export async function assignTruckPerson(formData: FormData) {
   });
 
   revalidatePath("/locations");
+  revalidatePath(`/locations/${locationId}`);
   revalidatePath("/stock");
   revalidatePath("/");
   revalidatePath("/receive");

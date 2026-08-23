@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { stockChip } from "@/lib/utils";
 
@@ -40,13 +41,15 @@ export default async function StockPage() {
                     return (
                       <tr key={row.id}>
                         <td>
-                          <span className="sku">{row.location.code}</span>
-                          <div className="text-xs text-muted">
-                            {row.location.name}
-                            {row.location.kind === "TRUCK" && row.location.assignedUser?.name
-                              ? ` · ${row.location.assignedUser.name}`
-                              : ""}
-                          </div>
+                          <Link href={`/locations/${row.location.id}`} className="row-link-target">
+                            <span className="sku">{row.location.code}</span>
+                            <div className="text-xs text-muted">
+                              {row.location.name}
+                              {row.location.kind === "TRUCK" && row.location.assignedUser?.name
+                                ? ` · ${row.location.assignedUser.name}`
+                                : ""}
+                            </div>
+                          </Link>
                         </td>
                         <td className="sku">{row.item.sku}</td>
                         <td>{row.item.name}</td>

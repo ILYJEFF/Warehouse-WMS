@@ -1,5 +1,6 @@
 import { assignTruckPerson, createLocation } from "@/lib/actions/stock";
 import { prisma } from "@/lib/prisma";
+import Link from "next/link";
 
 export default async function LocationsPage() {
   const [locations, users] = await Promise.all([
@@ -79,9 +80,17 @@ export default async function LocationsPage() {
                 </thead>
                 <tbody>
                   {locations.map((loc) => (
-                    <tr key={loc.id}>
-                      <td className="sku">{loc.code}</td>
-                      <td>{loc.name}</td>
+                    <tr key={loc.id} className="row-link">
+                      <td className="sku">
+                        <Link href={`/locations/${loc.id}`} className="row-link-target">
+                          {loc.code}
+                        </Link>
+                      </td>
+                      <td>
+                        <Link href={`/locations/${loc.id}`} className="row-link-target">
+                          {loc.name}
+                        </Link>
+                      </td>
                       <td>
                         <span className="chip chip-muted">{loc.kind}</span>
                       </td>
@@ -112,7 +121,11 @@ export default async function LocationsPage() {
                           <span className="text-muted">—</span>
                         )}
                       </td>
-                      <td>{loc._count.balances}</td>
+                      <td>
+                        <Link href={`/locations/${loc.id}`} className="text-link font-semibold">
+                          {loc._count.balances}
+                        </Link>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
