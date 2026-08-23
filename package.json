@@ -14,6 +14,7 @@
     "db:ensure-activity": "tsx scripts/ensure-user-activity.ts",
     "db:ensure-vendors": "tsx scripts/ensure-vendors.ts",
     "db:ensure-trucks": "tsx scripts/ensure-truck-fields.ts",
+    "db:ensure-integrations": "tsx scripts/ensure-integrations.ts",
     "db:studio": "prisma studio",
     "postinstall": "prisma generate"
   },

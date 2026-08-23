@@ -27,7 +27,13 @@ const NAV = [
   { href: "/moves", label: "Recent Activity", icon: ClipboardList },
 ] as const;
 
-const SETTINGS_HREFS = ["/settings", "/users", "/tags", "/vendors"] as const;
+const SETTINGS_HREFS = [
+  "/settings",
+  "/users",
+  "/tags",
+  "/vendors",
+] as const;
+
 
 function isSettingsPath(pathname: string) {
   return SETTINGS_HREFS.some(

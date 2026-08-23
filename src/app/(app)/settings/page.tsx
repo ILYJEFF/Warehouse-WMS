@@ -1,13 +1,21 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { ArrowRight, Store, Tags, Users } from "lucide-react";
+import { ArrowRight, Plug, Store, Tags, Users } from "lucide-react";
 import { BackButton } from "@/components/back-button";
 import { DemoDataPanel } from "@/components/demo-data-panel";
 import { isAdmin, requireUser } from "@/lib/auth";
 import { demoStatsTotal, getDemoStats } from "@/lib/demo-seed";
+import { getJobberConnection } from "@/lib/jobber-connection";
 import { prisma } from "@/lib/prisma";
 
 const SETTINGS_LINKS = [
+  {
+    href: "/settings/integrations",
+    title: "Integrations",
+    description: "Connect Jobber and other systems used with warehouse jobs.",
+    icon: Plug,
+    accent: "#7c3aed",
+  },
   {
     href: "/users",
     title: "Users",
@@ -40,7 +48,10 @@ export default async function SettingsPage({
   if (!me || !isAdmin(me.role)) redirect("/");
 
   const params = await searchParams;
-  const stats = await getDemoStats(prisma);
+  const [stats, jobber] = await Promise.all([
+    getDemoStats(prisma),
+    getJobberConnection(),
+  ]);
   const total = demoStatsTotal(stats);
 
   const banner =
@@ -62,7 +73,7 @@ export default async function SettingsPage({
       </div>
       <section className="content">
         <p className="mb-5 max-w-2xl text-sm text-[#777]">
-          Admin tools for people, vendors, and catalog labels. Pick a section to manage.
+          Admin tools for integrations, people, vendors, and catalog labels.
         </p>
 
         {banner ? (
@@ -89,6 +100,15 @@ export default async function SettingsPage({
                 <span className="settings-tile-body">
                   <span className="settings-tile-title">{item.title}</span>
                   <span className="settings-tile-desc">{item.description}</span>
+                  {item.href === "/settings/integrations" ? (
+                    <span
+                      className={`mt-2 inline-flex w-fit chip ${
+                        jobber ? "chip-ok" : "chip-muted"
+                      }`}
+                    >
+                      {jobber ? "Jobber connected" : "No connections"}
+                    </span>
+                  ) : null}
                 </span>
                 <ArrowRight className="settings-tile-arrow h-5 w-5" />
               </Link>

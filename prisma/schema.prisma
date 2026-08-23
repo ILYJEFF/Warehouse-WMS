@@ -153,3 +153,18 @@ model StockMove {
   @@index([itemId])
   @@index([jobRef])
 }
+
+model IntegrationConnection {
+  id           String    @id @default(cuid())
+  provider     String    @unique
+  accountId    String?
+  accountName  String?
+  accessToken  String
+  refreshToken String
+  tokenType    String    @default("Bearer")
+  expiresAt    DateTime?
+  connectedAt  DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  lastSyncAt   DateTime?
+  metadata     Json?
+}
