@@ -1,7 +1,7 @@
 import { format } from "date-fns";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { assignTruckPerson } from "@/lib/actions/stock";
+import { assignTruckPerson, updateTruckVehicle } from "@/lib/actions/stock";
 import { LocationStockTable } from "@/components/location-stock-table";
 import { roleLabel } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
@@ -9,10 +9,12 @@ import { money } from "@/lib/utils";
 
 type Props = {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ saved?: string }>;
 };
 
-export default async function LocationDetailPage({ params }: Props) {
+export default async function LocationDetailPage({ params, searchParams }: Props) {
   const { id } = await params;
+  const query = await searchParams;
 
   const [location, users, recentMoves] = await Promise.all([
     prisma.location.findFirst({
@@ -67,6 +69,12 @@ export default async function LocationDetailPage({ params }: Props) {
       </div>
 
       <section className="content">
+        {query.saved ? (
+          <div className="mb-4 rounded bg-[#dff0d8] px-3 py-2 text-sm text-[#3c763d]">
+            Truck details saved.
+          </div>
+        ) : null}
+
         <div className="grid gap-4 lg:grid-cols-3">
           <div className="box box-primary lg:col-span-2">
             <div className="box-header">Location Details</div>
@@ -90,6 +98,18 @@ export default async function LocationDetailPage({ params }: Props) {
                   <dt>Inventory value</dt>
                   <dd>{money(totalValueCents)}</dd>
                 </div>
+                {location.kind === "TRUCK" ? (
+                  <>
+                    <div>
+                      <dt>License plate</dt>
+                      <dd className="font-mono">{location.licensePlate || "—"}</dd>
+                    </div>
+                    <div>
+                      <dt>VIN</dt>
+                      <dd className="font-mono text-sm">{location.vin || "—"}</dd>
+                    </div>
+                  </>
+                ) : null}
               </dl>
             </div>
           </div>
@@ -136,6 +156,60 @@ export default async function LocationDetailPage({ params }: Props) {
             </div>
           ) : null}
         </div>
+
+        {location.kind === "TRUCK" ? (
+          <div className="box box-primary">
+            <div className="box-header">Truck vehicle info</div>
+            <div className="box-body">
+              <form
+                action={updateTruckVehicle}
+                className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3"
+              >
+                <input type="hidden" name="locationId" value={location.id} />
+                <label>
+                  <span className="field-label">Truck name</span>
+                  <input
+                    className="field"
+                    name="name"
+                    defaultValue={location.name}
+                    required
+                    autoComplete="off"
+                  />
+                </label>
+                <label>
+                  <span className="field-label">License plate</span>
+                  <input
+                    className="field"
+                    name="licensePlate"
+                    defaultValue={location.licensePlate ?? ""}
+                    required
+                    autoComplete="off"
+                  />
+                </label>
+                <label>
+                  <span className="field-label">VIN (optional)</span>
+                  <input
+                    className="field"
+                    name="vin"
+                    defaultValue={location.vin ?? ""}
+                    maxLength={17}
+                    autoComplete="off"
+                  />
+                </label>
+                <div className="sm:col-span-2 lg:col-span-3 rounded border border-[#d2d6de] bg-[#fafafa] px-3 py-2 text-sm text-[#666]">
+                  Saving rebuilds the location code as{" "}
+                  <span className="font-mono text-[#444]">TRK-##-PLATE</span>{" "}
+                  using this truck&apos;s number and the new plate.
+                </div>
+                <div className="sm:col-span-2 lg:col-span-3">
+                  <button type="submit" className="btn-primary">
+                    Save vehicle info
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        ) : null}
 
         <div className="box box-primary">
           <div className="box-header">Stock On Hand</div>

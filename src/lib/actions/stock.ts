@@ -6,6 +6,12 @@ import { LocationKind, MoveType, Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/auth";
 import { syncItemTags } from "@/lib/sync-item-tags";
+import {
+  buildTruckCode,
+  normalizeLicensePlate,
+  normalizeVin,
+  parseTruckNumber,
+} from "@/lib/locations";
 
 async function authed() {
   const user = await requireUser();
@@ -87,11 +93,8 @@ export async function updateItem(formData: FormData) {
 
 export async function createLocation(formData: FormData) {
   await authed();
-  const code = String(formData.get("code") ?? "")
-    .trim()
-    .toUpperCase();
   const name = String(formData.get("name") ?? "").trim();
-  if (!code || !name) throw new Error("Code and name are required");
+  if (!name) throw new Error("Name is required");
 
   const kindRaw = String(formData.get("kind") ?? "SHOP");
   const kind = (["SHOP", "TRUCK", "OTHER"].includes(kindRaw)
@@ -107,12 +110,96 @@ export async function createLocation(formData: FormData) {
     if (!user) throw new Error("Assigned person not found");
   }
 
+  let code: string;
+  let vin: string | null = null;
+  let licensePlate: string | null = null;
+
+  if (kind === "TRUCK") {
+    const plateRaw = String(formData.get("licensePlate") ?? "");
+    const plate = normalizeLicensePlate(plateRaw);
+    if (!plate) throw new Error("License plate is required for trucks");
+
+    vin = normalizeVin(String(formData.get("vin") ?? ""));
+    licensePlate = plate;
+
+    const trucks = await prisma.location.findMany({
+      where: { kind: "TRUCK" },
+      select: { code: true },
+    });
+    let maxNum = 0;
+    for (const truck of trucks) {
+      const n = parseTruckNumber(truck.code);
+      if (n !== null) maxNum = Math.max(maxNum, n);
+    }
+    code = buildTruckCode(maxNum + 1, plate);
+
+    const codeTaken = await prisma.location.findUnique({ where: { code } });
+    if (codeTaken) throw new Error("That truck code already exists");
+  } else {
+    code = String(formData.get("code") ?? "")
+      .trim()
+      .toUpperCase();
+    if (!code) throw new Error("Code and name are required");
+  }
+
   await prisma.location.create({
-    data: { code, name, kind, assignedUserId },
+    data: {
+      code,
+      name,
+      kind,
+      assignedUserId,
+      vin,
+      licensePlate,
+    },
   });
   revalidatePath("/locations");
   revalidatePath("/stock");
   revalidatePath("/");
+}
+
+export async function updateTruckVehicle(formData: FormData) {
+  await authed();
+  const locationId = String(formData.get("locationId") ?? "").trim();
+  if (!locationId) throw new Error("Location is required");
+
+  const location = await prisma.location.findUnique({ where: { id: locationId } });
+  if (!location) throw new Error("Location not found");
+  if (location.kind !== "TRUCK") {
+    throw new Error("Only trucks have VIN and license plate");
+  }
+
+  const plate = normalizeLicensePlate(String(formData.get("licensePlate") ?? ""));
+  if (!plate) throw new Error("License plate is required for trucks");
+
+  const vin = normalizeVin(String(formData.get("vin") ?? ""));
+  const name = String(formData.get("name") ?? "").trim() || location.name;
+
+  const truckNum = parseTruckNumber(location.code) ?? 1;
+  const code = buildTruckCode(truckNum, plate);
+
+  const codeTaken = await prisma.location.findFirst({
+    where: { code, NOT: { id: locationId } },
+    select: { id: true },
+  });
+  if (codeTaken) throw new Error("That truck code already exists");
+
+  await prisma.location.update({
+    where: { id: locationId },
+    data: {
+      code,
+      name,
+      vin,
+      licensePlate: plate,
+    },
+  });
+
+  revalidatePath("/locations");
+  revalidatePath(`/locations/${locationId}`);
+  revalidatePath("/stock");
+  revalidatePath("/");
+  revalidatePath("/receive");
+  revalidatePath("/pull");
+  redirect(`/locations/${locationId}?saved=1`);
 }
 
 export async function assignTruckPerson(formData: FormData) {
