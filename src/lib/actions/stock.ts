@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { LocationKind, MoveType, Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/auth";
-import { parseTags } from "@/lib/utils";
+import { syncItemTags } from "@/lib/sync-item-tags";
 
 async function authed() {
   const user = await requireUser();
@@ -26,7 +26,7 @@ export async function createItem(formData: FormData) {
   const name = String(formData.get("name") ?? "").trim();
   if (!sku || !name) throw new Error("SKU and name are required");
 
-  await prisma.item.create({
+  const item = await prisma.item.create({
     data: {
       sku,
       name,
@@ -35,12 +35,13 @@ export async function createItem(formData: FormData) {
       reorderPoint: Math.max(0, parseIntSafe(formData.get("reorderPoint"))),
       unitCostCents: Math.max(0, Math.round(Number(formData.get("unitCost") ?? 0) * 100)),
       notes: String(formData.get("notes") ?? "").trim() || null,
-      tags: parseTags(String(formData.get("tags") ?? "")),
     },
   });
+  await syncItemTags(item.id, formData);
   revalidatePath("/items");
   revalidatePath("/");
   revalidatePath("/stock");
+  redirect(`/items/${item.id}`);
 }
 
 export async function updateItem(formData: FormData) {
@@ -68,9 +69,9 @@ export async function updateItem(formData: FormData) {
       reorderPoint: Math.max(0, parseIntSafe(formData.get("reorderPoint"))),
       unitCostCents: Math.max(0, Math.round(Number(formData.get("unitCost") ?? 0) * 100)),
       notes: String(formData.get("notes") ?? "").trim() || null,
-      tags: parseTags(String(formData.get("tags") ?? "")),
     },
   });
+  await syncItemTags(id, formData);
   revalidatePath("/items");
   revalidatePath(`/items/${id}`);
   revalidatePath("/");

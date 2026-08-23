@@ -47,12 +47,31 @@ model Item {
   reorderPoint  Int            @default(0)
   unitCostCents Int            @default(0)
   notes         String?
-  tags          String[]       @default([])
   active        Boolean        @default(true)
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
   balances      StockBalance[]
   moves         StockMove[]
+  itemTags      ItemTag[]
+}
+
+model Tag {
+  id        String    @id @default(cuid())
+  name      String    @unique
+  color     String    @default("#3c8dbc")
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  items     ItemTag[]
+}
+
+model ItemTag {
+  itemId String
+  tagId  String
+  item   Item @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  tag    Tag  @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([itemId, tagId])
+  @@index([tagId])
 }
 
 model Location {

@@ -17,21 +17,3 @@ export function stockChip(qty: number, reorderPoint: number) {
   if (qty <= reorderPoint) return { label: "Low", className: "chip chip-warn" };
   return { label: "In stock", className: "chip chip-ok" };
 }
-
-/** Normalize freeform tag input into unique lowercase tags. */
-export function parseTags(raw: string | null | undefined) {
-  if (!raw) return [] as string[];
-  const seen = new Set<string>();
-  const tags: string[] = [];
-  for (const part of raw.split(/[,;\n]+/)) {
-    const tag = part.trim().toLowerCase().replace(/\s+/g, "-");
-    if (!tag || seen.has(tag)) continue;
-    seen.add(tag);
-    tags.push(tag);
-  }
-  return tags;
-}
-
-export function formatTagsInput(tags: string[]) {
-  return tags.join(", ");
-}

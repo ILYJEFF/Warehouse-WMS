@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { AddItemPanel } from "@/components/add-item-panel";
+import { TagChip } from "@/components/tag-chip";
 import { prisma } from "@/lib/prisma";
+import { tagTextColor } from "@/lib/tags";
 import { money, stockChip } from "@/lib/utils";
 
 export default async function ItemsPage({
@@ -11,24 +13,22 @@ export default async function ItemsPage({
   const params = await searchParams;
   const activeTag = (params.tag ?? "").trim().toLowerCase();
 
-  const [items, tagRows] = await Promise.all([
+  const [items, catalog] = await Promise.all([
     prisma.item.findMany({
       where: {
         active: true,
-        ...(activeTag ? { tags: { has: activeTag } } : {}),
+        ...(activeTag
+          ? { itemTags: { some: { tag: { name: activeTag } } } }
+          : {}),
       },
       orderBy: { sku: "asc" },
-      include: { balances: true },
+      include: {
+        balances: true,
+        itemTags: { include: { tag: true }, orderBy: { tag: { name: "asc" } } },
+      },
     }),
-    prisma.item.findMany({
-      where: { active: true },
-      select: { tags: true },
-    }),
+    prisma.tag.findMany({ orderBy: { name: "asc" } }),
   ]);
-
-  const allTags = Array.from(
-    new Set(tagRows.flatMap((row) => row.tags)),
-  ).sort((a, b) => a.localeCompare(b));
 
   return (
     <>
@@ -36,9 +36,9 @@ export default async function ItemsPage({
         <h1>Items</h1>
       </div>
       <section className="content">
-        <AddItemPanel />
+        <AddItemPanel catalog={catalog} />
 
-        {allTags.length > 0 ? (
+        {catalog.length > 0 ? (
           <div className="box">
             <div className="box-header">Filter by tag</div>
             <div className="box-body">
@@ -49,13 +49,22 @@ export default async function ItemsPage({
                 >
                   All
                 </Link>
-                {allTags.map((tag) => (
+                {catalog.map((tag) => (
                   <Link
-                    key={tag}
-                    href={`/items?tag=${encodeURIComponent(tag)}`}
-                    className={`tag-filter ${activeTag === tag ? "is-active" : ""}`}
+                    key={tag.id}
+                    href={`/items?tag=${encodeURIComponent(tag.name)}`}
+                    className={`tag-filter ${activeTag === tag.name ? "is-active" : ""}`}
+                    style={
+                      activeTag === tag.name
+                        ? {
+                            background: tag.color,
+                            borderColor: tag.color,
+                            color: tagTextColor(tag.color),
+                          }
+                        : { borderColor: tag.color, color: tag.color }
+                    }
                   >
-                    {tag}
+                    {tag.name}
                   </Link>
                 ))}
               </div>
@@ -111,18 +120,16 @@ export default async function ItemsPage({
                           </Link>
                         </td>
                         <td>
-                          {item.tags.length === 0 ? (
+                          {item.itemTags.length === 0 ? (
                             <span className="text-muted">-</span>
                           ) : (
                             <div className="tag-list">
-                              {item.tags.map((tag) => (
-                                <Link
-                                  key={tag}
-                                  href={`/items?tag=${encodeURIComponent(tag)}`}
-                                  className="tag-chip"
-                                >
-                                  {tag}
-                                </Link>
+                              {item.itemTags.map(({ tag }) => (
+                                <TagChip
+                                  key={tag.id}
+                                  tag={tag}
+                                  href={`/items?tag=${encodeURIComponent(tag.name)}`}
+                                />
                               ))}
                             </div>
                           )}

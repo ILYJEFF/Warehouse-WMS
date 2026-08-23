@@ -3,8 +3,10 @@
 import { useState } from "react";
 import { ChevronDown, Plus } from "lucide-react";
 import { createItem } from "@/lib/actions/stock";
+import { TagPicker } from "@/components/tag-picker";
+import type { TagOption } from "@/lib/tags";
 
-export function AddItemPanel() {
+export function AddItemPanel({ catalog }: { catalog: TagOption[] }) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -63,15 +65,9 @@ export function AddItemPanel() {
                 min={0}
               />
             </label>
-            <label className="sm:col-span-2 lg:col-span-3">
-              <span className="field-label">Tags</span>
-              <input
-                className="field"
-                name="tags"
-                placeholder="conduit, wire, truck-stock"
-              />
-              <span className="field-hint">Comma-separated. Used to filter items later.</span>
-            </label>
+            <div className="sm:col-span-2 lg:col-span-3">
+              <TagPicker catalog={catalog} />
+            </div>
             <div className="sm:col-span-2 lg:col-span-3">
               <button type="submit" className="btn-primary">
                 Save

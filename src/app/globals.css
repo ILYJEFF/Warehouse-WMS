@@ -289,6 +289,7 @@ select.field:focus {
 .tag-chip {
   display: inline-flex;
   align-items: center;
+  gap: 0.25rem;
   border-radius: 2px;
   background: #eef6fb;
   padding: 2px 7px;
@@ -299,8 +300,101 @@ select.field:focus {
 }
 
 .tag-chip:hover {
-  background: #dceef8;
+  filter: brightness(0.96);
   text-decoration: none;
+}
+
+.tag-chip-button {
+  border: 0;
+  cursor: pointer;
+}
+
+.tag-picker {
+  position: relative;
+}
+
+.tag-picker-search {
+  position: relative;
+}
+
+.tag-picker-search-icon {
+  position: absolute;
+  top: 50%;
+  left: 12px;
+  color: #999;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+.tag-picker-input {
+  padding-left: 2.1rem;
+}
+
+.tag-picker-menu {
+  position: absolute;
+  z-index: 20;
+  right: 0;
+  left: 0;
+  margin-top: 0.35rem;
+  border: 1px solid #d2d6de;
+  border-radius: 3px;
+  background: #fff;
+  box-shadow: 0 4px 14px rgb(0 0 0 / 12%);
+  max-height: 18rem;
+  overflow: auto;
+}
+
+.tag-picker-option {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  border: 0;
+  background: transparent;
+  padding: 0.55rem 0.75rem;
+  cursor: pointer;
+  text-align: left;
+}
+
+.tag-picker-option:hover {
+  background: #f5f8fa;
+}
+
+.tag-picker-create {
+  border-top: 1px solid #f0f0f0;
+  padding: 0.75rem;
+}
+
+.tag-picker-create-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.tag-color-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-top: 0.55rem;
+}
+
+.tag-color-swatch {
+  width: 1.35rem;
+  height: 1.35rem;
+  border: 2px solid transparent;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.tag-color-swatch.is-active {
+  border-color: #333;
+  box-shadow: 0 0 0 1px #fff inset;
+}
+
+.tag-picker-empty {
+  margin: 0;
+  padding: 0.75rem;
+  color: var(--muted);
+  font-size: 13px;
 }
 
 .btn-primary {

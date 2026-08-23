@@ -1,9 +1,11 @@
 import { format } from "date-fns";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { TagChip } from "@/components/tag-chip";
+import { TagPicker } from "@/components/tag-picker";
 import { updateItem } from "@/lib/actions/stock";
 import { prisma } from "@/lib/prisma";
-import { formatTagsInput, money, stockChip } from "@/lib/utils";
+import { money, stockChip } from "@/lib/utils";
 
 type Props = {
   params: Promise<{ id: string }>;
@@ -14,7 +16,7 @@ export default async function ItemDetailPage({ params, searchParams }: Props) {
   const { id } = await params;
   const query = await searchParams;
 
-  const [item, recentMoves] = await Promise.all([
+  const [item, catalog, recentMoves] = await Promise.all([
     prisma.item.findFirst({
       where: { id, active: true },
       include: {
@@ -25,8 +27,10 @@ export default async function ItemDetailPage({ params, searchParams }: Props) {
             location: { include: { assignedUser: { select: { name: true } } } },
           },
         },
+        itemTags: { include: { tag: true }, orderBy: { tag: { name: "asc" } } },
       },
     }),
+    prisma.tag.findMany({ orderBy: { name: "asc" } }),
     prisma.stockMove.findMany({
       where: { itemId: id },
       take: 20,
@@ -47,6 +51,7 @@ export default async function ItemDetailPage({ params, searchParams }: Props) {
     0,
   );
   const chip = stockChip(totalQty, item.reorderPoint);
+  const selectedTags = item.itemTags.map((row) => row.tag);
 
   return (
     <>
@@ -102,18 +107,16 @@ export default async function ItemDetailPage({ params, searchParams }: Props) {
               </dl>
               <div className="mt-4">
                 <p className="field-label m-0">Tags</p>
-                {item.tags.length === 0 ? (
+                {selectedTags.length === 0 ? (
                   <p className="m-0 mt-1 text-muted">None</p>
                 ) : (
                   <div className="tag-list mt-2">
-                    {item.tags.map((tag) => (
-                      <Link
-                        key={tag}
-                        href={`/items?tag=${encodeURIComponent(tag)}`}
-                        className="tag-chip"
-                      >
-                        {tag}
-                      </Link>
+                    {selectedTags.map((tag) => (
+                      <TagChip
+                        key={tag.id}
+                        tag={tag}
+                        href={`/items?tag=${encodeURIComponent(tag.name)}`}
+                      />
                     ))}
                   </div>
                 )}
@@ -176,16 +179,9 @@ export default async function ItemDetailPage({ params, searchParams }: Props) {
                   defaultValue={(item.unitCostCents / 100).toFixed(2)}
                 />
               </label>
-              <label className="sm:col-span-2 lg:col-span-3">
-                <span className="field-label">Tags</span>
-                <input
-                  className="field"
-                  name="tags"
-                  defaultValue={formatTagsInput(item.tags)}
-                  placeholder="conduit, wire, truck-stock"
-                />
-                <span className="field-hint">Comma-separated. Used to filter items later.</span>
-              </label>
+              <div className="sm:col-span-2 lg:col-span-3">
+                <TagPicker catalog={catalog} initialSelected={selectedTags} />
+              </div>
               <label className="sm:col-span-2 lg:col-span-3">
                 <span className="field-label">Notes</span>
                 <input className="field" name="notes" defaultValue={item.notes ?? ""} />
@@ -283,7 +279,7 @@ export default async function ItemDetailPage({ params, searchParams }: Props) {
                               {move.fromLocation.code}
                             </Link>
                           ) : (
-                            <span className="text-muted">—</span>
+                            <span className="text-muted">-</span>
                           )}
                         </td>
                         <td>
@@ -297,7 +293,7 @@ export default async function ItemDetailPage({ params, searchParams }: Props) {
                           ) : move.jobRef ? (
                             move.jobRef
                           ) : (
-                            <span className="text-muted">—</span>
+                            <span className="text-muted">-</span>
                           )}
                         </td>
                         <td>{move.user?.name ?? "System"}</td>
