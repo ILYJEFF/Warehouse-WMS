@@ -6,7 +6,6 @@ import {
   clearSession,
   createSession,
   hashPassword,
-  MIN_PASSWORD_LENGTH,
   requireUser,
   safeRedirectPath,
   validatePassword,
@@ -78,5 +77,3 @@ export async function ensureAuthed() {
   if (!user) redirect("/login");
   return user;
 }
-
-export { MIN_PASSWORD_LENGTH };
