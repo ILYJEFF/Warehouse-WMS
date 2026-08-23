@@ -51,12 +51,31 @@ model Item {
   reorderPoint  Int            @default(0)
   unitCostCents Int            @default(0)
   notes         String?
+  vendorId      String?
+  vendorSku     String?
   active        Boolean        @default(true)
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
+  vendor        Vendor?        @relation(fields: [vendorId], references: [id], onDelete: SetNull)
   balances      StockBalance[]
   moves         StockMove[]
   itemTags      ItemTag[]
+
+  @@index([vendorId])
+}
+
+model Vendor {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  code      String?
+  phone     String?
+  email     String?
+  website   String?
+  notes     String?
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  items     Item[]
 }
 
 model Tag {

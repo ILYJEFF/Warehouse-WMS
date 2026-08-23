@@ -13,7 +13,7 @@ export default async function ItemsPage({
   const params = await searchParams;
   const activeTag = (params.tag ?? "").trim().toLowerCase();
 
-  const [items, catalog] = await Promise.all([
+  const [items, catalog, vendors] = await Promise.all([
     prisma.item.findMany({
       where: {
         active: true,
@@ -24,10 +24,16 @@ export default async function ItemsPage({
       orderBy: { sku: "asc" },
       include: {
         balances: true,
+        vendor: true,
         itemTags: { include: { tag: true }, orderBy: { tag: { name: "asc" } } },
       },
     }),
     prisma.tag.findMany({ orderBy: { name: "asc" } }),
+    prisma.vendor.findMany({
+      where: { active: true },
+      orderBy: { name: "asc" },
+      select: { id: true, name: true },
+    }),
   ]);
 
   return (
@@ -36,7 +42,7 @@ export default async function ItemsPage({
         <h1>Items</h1>
       </div>
       <section className="content">
-        <AddItemPanel catalog={catalog} />
+        <AddItemPanel catalog={catalog} vendors={vendors} />
 
         {catalog.length > 0 ? (
           <div className="box">
@@ -86,6 +92,7 @@ export default async function ItemsPage({
                   <tr>
                     <th>SKU</th>
                     <th>Name</th>
+                    <th>Vendor</th>
                     <th>Tags</th>
                     <th>Category</th>
                     <th>On hand</th>
@@ -97,7 +104,7 @@ export default async function ItemsPage({
                 <tbody>
                   {items.length === 0 ? (
                     <tr>
-                      <td colSpan={8} className="p-4 text-muted">
+                      <td colSpan={9} className="p-4 text-muted">
                         {activeTag
                           ? `No items tagged "${activeTag}".`
                           : "No items yet."}
@@ -118,6 +125,20 @@ export default async function ItemsPage({
                           <Link href={`/items/${item.id}`} className="row-link-target">
                             {item.name}
                           </Link>
+                        </td>
+                        <td>
+                          {item.vendor ? (
+                            <div>
+                              <div>{item.vendor.name}</div>
+                              {item.vendorSku ? (
+                                <div className="text-xs text-[#999]">
+                                  #{item.vendorSku}
+                                </div>
+                              ) : null}
+                            </div>
+                          ) : (
+                            <span className="text-muted">—</span>
+                          )}
                         </td>
                         <td>
                           {item.itemTags.length === 0 ? (

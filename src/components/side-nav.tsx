@@ -10,6 +10,7 @@ import {
   PackageMinus,
   PackagePlus,
   Settings,
+  ShoppingCart,
   Trophy,
   Warehouse,
 } from "lucide-react";
@@ -21,11 +22,12 @@ const NAV = [
   { href: "/stock", label: "Stock", icon: Warehouse },
   { href: "/receive", label: "Receive", icon: PackagePlus },
   { href: "/pull", label: "Pull to Job", icon: PackageMinus },
+  { href: "/purchasing", label: "Purchasing", icon: ShoppingCart },
   { href: "/top-skus", label: "Top 100 SKUs", icon: Trophy },
   { href: "/moves", label: "Recent Activity", icon: ClipboardList },
 ] as const;
 
-const SETTINGS_HREFS = ["/settings", "/users", "/tags"] as const;
+const SETTINGS_HREFS = ["/settings", "/users", "/tags", "/vendors"] as const;
 
 function isSettingsPath(pathname: string) {
   return SETTINGS_HREFS.some(

@@ -35,12 +35,15 @@ export async function createItem(formData: FormData) {
       reorderPoint: Math.max(0, parseIntSafe(formData.get("reorderPoint"))),
       unitCostCents: Math.max(0, Math.round(Number(formData.get("unitCost") ?? 0) * 100)),
       notes: String(formData.get("notes") ?? "").trim() || null,
+      vendorId: String(formData.get("vendorId") ?? "").trim() || null,
+      vendorSku: String(formData.get("vendorSku") ?? "").trim() || null,
     },
   });
   await syncItemTags(item.id, formData);
   revalidatePath("/items");
   revalidatePath("/");
   revalidatePath("/stock");
+  revalidatePath("/purchasing");
   redirect(`/items/${item.id}`);
 }
 
@@ -69,6 +72,8 @@ export async function updateItem(formData: FormData) {
       reorderPoint: Math.max(0, parseIntSafe(formData.get("reorderPoint"))),
       unitCostCents: Math.max(0, Math.round(Number(formData.get("unitCost") ?? 0) * 100)),
       notes: String(formData.get("notes") ?? "").trim() || null,
+      vendorId: String(formData.get("vendorId") ?? "").trim() || null,
+      vendorSku: String(formData.get("vendorSku") ?? "").trim() || null,
     },
   });
   await syncItemTags(id, formData);
@@ -76,6 +81,7 @@ export async function updateItem(formData: FormData) {
   revalidatePath(`/items/${id}`);
   revalidatePath("/");
   revalidatePath("/stock");
+  revalidatePath("/purchasing");
   redirect(`/items/${id}?saved=1`);
 }
 

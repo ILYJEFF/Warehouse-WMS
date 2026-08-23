@@ -16,10 +16,11 @@ export default async function ItemDetailPage({ params, searchParams }: Props) {
   const { id } = await params;
   const query = await searchParams;
 
-  const [item, catalog, recentMoves] = await Promise.all([
+  const [item, catalog, vendors, recentMoves] = await Promise.all([
     prisma.item.findFirst({
       where: { id, active: true },
       include: {
+        vendor: true,
         balances: {
           where: { qty: { gt: 0 } },
           orderBy: { location: { code: "asc" } },
@@ -31,6 +32,11 @@ export default async function ItemDetailPage({ params, searchParams }: Props) {
       },
     }),
     prisma.tag.findMany({ orderBy: { name: "asc" } }),
+    prisma.vendor.findMany({
+      where: { active: true },
+      orderBy: { name: "asc" },
+      select: { id: true, name: true },
+    }),
     prisma.stockMove.findMany({
       where: { itemId: id },
       take: 20,
@@ -104,6 +110,14 @@ export default async function ItemDetailPage({ params, searchParams }: Props) {
                   <dt>Unit</dt>
                   <dd>{item.unit}</dd>
                 </div>
+                <div>
+                  <dt>Vendor</dt>
+                  <dd>{item.vendor?.name ?? "—"}</dd>
+                </div>
+                <div>
+                  <dt>Vendor SKU</dt>
+                  <dd>{item.vendorSku ?? "—"}</dd>
+                </div>
               </dl>
               <div className="mt-4">
                 <p className="field-label m-0">Tags</p>
@@ -132,6 +146,9 @@ export default async function ItemDetailPage({ params, searchParams }: Props) {
               </Link>
               <Link href={`/pull?itemId=${item.id}`} className="btn-ghost w-full no-underline">
                 Pull to job
+              </Link>
+              <Link href="/purchasing" className="btn-ghost w-full no-underline">
+                Purchasing list
               </Link>
             </div>
           </div>
@@ -177,6 +194,35 @@ export default async function ItemDetailPage({ params, searchParams }: Props) {
                   step="0.01"
                   min={0}
                   defaultValue={(item.unitCostCents / 100).toFixed(2)}
+                />
+              </label>
+              <label>
+                <span className="field-label">Vendor (optional)</span>
+                <select
+                  className="field"
+                  name="vendorId"
+                  defaultValue={item.vendorId ?? ""}
+                >
+                  <option value="">No vendor</option>
+                  {vendors.map((vendor) => (
+                    <option key={vendor.id} value={vendor.id}>
+                      {vendor.name}
+                    </option>
+                  ))}
+                  {item.vendorId &&
+                  !vendors.some((vendor) => vendor.id === item.vendorId) &&
+                  item.vendor ? (
+                    <option value={item.vendor.id}>{item.vendor.name} (inactive)</option>
+                  ) : null}
+                </select>
+              </label>
+              <label>
+                <span className="field-label">Vendor SKU / part # (optional)</span>
+                <input
+                  className="field"
+                  name="vendorSku"
+                  defaultValue={item.vendorSku ?? ""}
+                  autoComplete="off"
                 />
               </label>
               <div className="sm:col-span-2 lg:col-span-3">

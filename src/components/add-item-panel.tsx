@@ -6,7 +6,15 @@ import { CollapsibleFormBox } from "@/components/collapsible-form-box";
 import { TagPicker } from "@/components/tag-picker";
 import type { TagOption } from "@/lib/tags";
 
-export function AddItemPanel({ catalog }: { catalog: TagOption[] }) {
+type VendorOption = { id: string; name: string };
+
+export function AddItemPanel({
+  catalog,
+  vendors,
+}: {
+  catalog: TagOption[];
+  vendors: VendorOption[];
+}) {
   return (
     <CollapsibleFormBox title="Add Item" icon={<Plus className="h-4 w-4" />}>
       <form action={createItem} className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -46,6 +54,21 @@ export function AddItemPanel({ catalog }: { catalog: TagOption[] }) {
             defaultValue={0}
             min={0}
           />
+        </label>
+        <label>
+          <span className="field-label">Vendor (optional)</span>
+          <select className="field" name="vendorId" defaultValue="">
+            <option value="">No vendor</option>
+            {vendors.map((vendor) => (
+              <option key={vendor.id} value={vendor.id}>
+                {vendor.name}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label>
+          <span className="field-label">Vendor SKU / part # (optional)</span>
+          <input className="field" name="vendorSku" autoComplete="off" />
         </label>
         <div className="sm:col-span-2 lg:col-span-3">
           <TagPicker catalog={catalog} />

@@ -940,6 +940,38 @@ table.data tbody tr:hover td {
   vertical-align: middle;
 }
 
+.purchasing-intro {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.purchasing-stats {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+}
+
+.purchasing-stat-value {
+  display: block;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #444;
+  font-variant-numeric: tabular-nums;
+}
+
+.purchasing-stat-label {
+  display: block;
+  font-size: 11px;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
 table.data tbody tr.row-link:hover td {
   cursor: pointer;
 }

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { ArrowRight, Tags, Users } from "lucide-react";
+import { ArrowRight, Store, Tags, Users } from "lucide-react";
 import { isAdmin, requireUser } from "@/lib/auth";
 
 const SETTINGS_LINKS = [
@@ -10,6 +10,13 @@ const SETTINGS_LINKS = [
     description: "Create accounts, set roles, require authenticator 2FA, and review last login.",
     icon: Users,
     accent: "#3c8dbc",
+  },
+  {
+    href: "/vendors",
+    title: "Vendors",
+    description: "Suppliers you buy SKUs from. Assign them optionally on each item.",
+    icon: Store,
+    accent: "#f39c12",
   },
   {
     href: "/tags",
@@ -31,7 +38,7 @@ export default async function SettingsPage() {
       </div>
       <section className="content">
         <p className="mb-5 max-w-2xl text-sm text-[#777]">
-          Admin tools for people and catalog labels. Pick a section to manage.
+          Admin tools for people, vendors, and catalog labels. Pick a section to manage.
         </p>
 
         <div className="settings-grid">
