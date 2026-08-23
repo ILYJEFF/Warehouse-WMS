@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { redirect } from "next/navigation";
 import { BackButton } from "@/components/back-button";
 import { TagsManager } from "@/components/tags-manager";
