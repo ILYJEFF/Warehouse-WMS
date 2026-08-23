@@ -8,8 +8,6 @@ datasource db {
 }
 
 enum Role {
-  ADMIN
-  USER
   OWNER
   DISPATCH
   TECH
@@ -33,7 +31,7 @@ model User {
   email          String     @unique
   name           String
   passwordHash   String
-  role           Role       @default(USER)
+  role           Role       @default(TECH)
   createdAt      DateTime   @default(now())
   updatedAt      DateTime   @updatedAt
   moves          StockMove[]

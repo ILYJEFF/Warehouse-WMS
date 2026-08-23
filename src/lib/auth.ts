@@ -24,7 +24,7 @@ export type SessionUser = {
   role: AppRole;
 };
 
-/** OWNER/DISPATCH kept for older Neon rows; treat as Admin. */
+/** OWNER/DISPATCH are admin; TECH is a normal user. */
 export function isAdmin(role: Role | AppRole | string) {
   return role === "ADMIN" || role === "OWNER" || role === "DISPATCH";
 }

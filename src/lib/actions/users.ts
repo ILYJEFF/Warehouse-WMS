@@ -6,12 +6,13 @@ import type { Role } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import {
   hashPassword,
+  isAdmin,
   requireAdmin,
   validatePassword,
 } from "@/lib/auth";
 
+/** Persist roles Neon already has. UI still shows Admin / User. */
 function parseRole(raw: string): Role {
-  // Write legacy OWNER/TECH so Neon works before any enum migration.
   return raw === "ADMIN" ? "OWNER" : "TECH";
 }
 
@@ -68,6 +69,7 @@ export async function updateUser(formData: FormData) {
     .toLowerCase();
   const name = String(formData.get("name") ?? "").trim();
   const role = parseRole(String(formData.get("role") ?? "USER"));
+  const nextIsAdmin = isAdmin(role);
   const password = String(formData.get("password") ?? "");
 
   if (!id || !email || !name) {
@@ -87,11 +89,9 @@ export async function updateUser(formData: FormData) {
     redirect(`/users/${id}?error=exists`);
   }
 
-  const targetIsAdmin =
-    target.role === "ADMIN" || target.role === "OWNER" || target.role === "DISPATCH";
-  if (targetIsAdmin && role !== "ADMIN") {
+  if (isAdmin(target.role) && !nextIsAdmin) {
     const admins = await prisma.user.findMany({
-      where: { role: { in: ["ADMIN", "OWNER", "DISPATCH"] } },
+      where: { role: { in: ["OWNER", "DISPATCH"] } },
       select: { id: true },
     });
     if (admins.length <= 1 && admins[0]?.id === id) {
@@ -106,8 +106,7 @@ export async function updateUser(formData: FormData) {
     }
   }
 
-  // Avoid demoting yourself mid-session without another admin path.
-  if (id === admin.id && role !== "ADMIN") {
+  if (id === admin.id && !nextIsAdmin) {
     redirect(`/users/${id}?error=self`);
   }
 
