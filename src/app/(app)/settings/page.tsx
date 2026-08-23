@@ -1,7 +1,10 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { ArrowRight, Store, Tags, Users } from "lucide-react";
+import { DemoDataPanel } from "@/components/demo-data-panel";
 import { isAdmin, requireUser } from "@/lib/auth";
+import { demoStatsTotal, getDemoStats } from "@/lib/demo-seed";
+import { prisma } from "@/lib/prisma";
 
 const SETTINGS_LINKS = [
   {
@@ -27,9 +30,26 @@ const SETTINGS_LINKS = [
   },
 ] as const;
 
-export default async function SettingsPage() {
+export default async function SettingsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ demo?: string; items?: string; moves?: string }>;
+}) {
   const me = await requireUser();
   if (!me || !isAdmin(me.role)) redirect("/");
+
+  const params = await searchParams;
+  const stats = await getDemoStats(prisma);
+  const total = demoStatsTotal(stats);
+
+  const banner =
+    params.demo === "loaded"
+      ? `Test data loaded (${params.items ?? stats.items} SKUs, ${params.moves ?? stats.moves} moves).`
+      : params.demo === "cleared"
+        ? "Test data deleted. Real records were left alone."
+        : params.demo === "empty"
+          ? "No test data to delete."
+          : null;
 
   return (
     <>
@@ -41,7 +61,15 @@ export default async function SettingsPage() {
           Admin tools for people, vendors, and catalog labels. Pick a section to manage.
         </p>
 
-        <div className="settings-grid">
+        {banner ? (
+          <div className="mb-4 rounded bg-[#dff0d8] px-3 py-2 text-sm text-[#3c763d]">
+            {banner}
+          </div>
+        ) : null}
+
+        <DemoDataPanel stats={stats} total={total} />
+
+        <div className="settings-grid mt-4">
           {SETTINGS_LINKS.map((item) => {
             const Icon = item.icon;
             return (
