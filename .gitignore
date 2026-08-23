@@ -3,6 +3,10 @@
 .env.local
 .env*.local
 .env.docker
+.env.docker.local
+
+# Cloudflare tunnel secrets
+cloudflare/credentials.json
 
 # Next / Node
 node_modules

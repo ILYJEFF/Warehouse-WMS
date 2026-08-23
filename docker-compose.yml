@@ -1,11 +1,16 @@
-# Techchefs WMS — NAS deploy (Postgres + app)
-# Copy this folder to the NAS, then:
-#   1. cp .env.docker.example .env
-#   2. Edit POSTGRES_PASSWORD, AUTH_SECRET, ADMIN_PASSWORD
-#   3. docker compose up -d --build
+# Techchefs WMS — NAS + Cloudflare Tunnel
+# Public: https://warehouse.techchefstx.work
+# LAN:    http://192.168.0.24:3090
 #
-# LAN:  http://192.168.0.24:3090
-# DB:   192.168.0.24:5435  (LAN only — do not tunnel Postgres)
+# Setup:
+#   1. cp .env.docker.example .env
+#   2. Set POSTGRES_PASSWORD, AUTH_SECRET, ADMIN_PASSWORD, TUNNEL_TOKEN
+#   3. In Cloudflare Zero Trust → your tunnel → Public Hostname:
+#        warehouse.techchefstx.work  →  http://app:3090
+#      (Use http://app:3090 when cloudflared runs in this compose stack.)
+#   4. docker compose up -d --build
+#
+# Postgres stays on LAN port 5435 only. Never tunnel the database.
 
 services:
   db:
@@ -49,11 +54,21 @@ services:
       TZ: America/Chicago
       DATABASE_URL: postgresql://${POSTGRES_USER:-wms}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-wms}
       AUTH_SECRET: ${AUTH_SECRET:?Set AUTH_SECRET in .env}
-      APP_URL: ${APP_URL:-http://192.168.0.24:3090}
+      APP_URL: ${APP_URL:-https://warehouse.techchefstx.work}
       ADMIN_EMAIL: ${ADMIN_EMAIL:-dispatch@techchefstx.com}
       ADMIN_PASSWORD: ${ADMIN_PASSWORD:?Set ADMIN_PASSWORD in .env}
       ADMIN_NAME: ${ADMIN_NAME:-Dispatch}
       SEED_DEMO: ${SEED_DEMO:-true}
+
+  tunnel:
+    image: cloudflare/cloudflared:latest
+    container_name: wms-tunnel
+    restart: unless-stopped
+    command: tunnel run
+    environment:
+      TUNNEL_TOKEN: ${TUNNEL_TOKEN:?Set TUNNEL_TOKEN in .env}
+    depends_on:
+      - app
 
 volumes:
   wms-pgdata:
