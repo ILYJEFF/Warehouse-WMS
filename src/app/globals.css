@@ -343,7 +343,7 @@ select.field:focus {
   border-radius: 3px;
   background: #fff;
   box-shadow: 0 4px 14px rgb(0 0 0 / 12%);
-  max-height: 18rem;
+  max-height: 28rem;
   overflow: auto;
 }
 
