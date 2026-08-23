@@ -125,7 +125,9 @@ export default async function DashboardPage() {
                         </td>
                         <td>{move.type}</td>
                         <td>
-                          <span className="sku">{move.item.sku}</span> ({move.qty})
+                          <Link href={`/items/${move.item.id}`} className="row-link-target">
+                            <span className="sku">{move.item.sku}</span> ({move.qty})
+                          </Link>
                         </td>
                         <td>
                           {move.jobRef ??

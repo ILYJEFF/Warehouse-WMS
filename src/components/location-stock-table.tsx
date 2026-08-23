@@ -52,8 +52,16 @@ export function LocationStockTable({
             const chip = stockChip(row.qty, row.item.reorderPoint);
             return (
               <tr key={row.id}>
-                <td className="sku">{row.item.sku}</td>
-                <td>{row.item.name}</td>
+                <td className="sku">
+                  <Link href={`/items/${row.item.id}`} className="row-link-target">
+                    {row.item.sku}
+                  </Link>
+                </td>
+                <td>
+                  <Link href={`/items/${row.item.id}`} className="row-link-target">
+                    {row.item.name}
+                  </Link>
+                </td>
                 <td className="font-semibold">{row.qty}</td>
                 <td className="text-muted">{row.item.unit}</td>
                 <td>{money(row.qty * row.item.unitCostCents)}</td>

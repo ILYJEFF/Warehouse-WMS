@@ -1,4 +1,5 @@
 import { format } from "date-fns";
+import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 
 export default async function MovesPage() {
@@ -42,7 +43,9 @@ export default async function MovesPage() {
                       </td>
                       <td>{move.type}</td>
                       <td>
-                        <span className="sku">{move.item.sku}</span> ({move.qty})
+                        <Link href={`/items/${move.item.id}`} className="row-link-target">
+                          <span className="sku">{move.item.sku}</span> ({move.qty})
+                        </Link>
                       </td>
                       <td>
                         {move.jobRef ||

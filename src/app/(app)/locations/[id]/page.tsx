@@ -177,9 +177,11 @@ export default async function LocationDetailPage({ params }: Props) {
                             <span className="chip chip-muted">{move.type}</span>
                           </td>
                           <td>
+                          <Link href={`/items/${move.item.id}`} className="row-link-target">
                             <span className="sku">{move.item.sku}</span>
                             <div className="text-xs text-muted">{move.item.name}</div>
-                          </td>
+                          </Link>
+                        </td>
                           <td className="font-semibold">{move.qty}</td>
                           <td>
                             {other ? (

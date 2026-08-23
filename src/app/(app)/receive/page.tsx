@@ -2,7 +2,12 @@ import { receiveStock } from "@/lib/actions/stock";
 import { formatLocationLabel } from "@/lib/locations";
 import { prisma } from "@/lib/prisma";
 
-export default async function ReceivePage() {
+export default async function ReceivePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ itemId?: string }>;
+}) {
+  const params = await searchParams;
   const [items, locations] = await Promise.all([
     prisma.item.findMany({ where: { active: true }, orderBy: { sku: "asc" } }),
     prisma.location.findMany({
@@ -11,6 +16,11 @@ export default async function ReceivePage() {
       include: { assignedUser: { select: { name: true } } },
     }),
   ]);
+
+  const selectedItemId =
+    params.itemId && items.some((item) => item.id === params.itemId)
+      ? params.itemId
+      : "";
 
   return (
     <>
@@ -24,7 +34,7 @@ export default async function ReceivePage() {
             <form action={receiveStock} className="space-y-4">
               <label className="block">
                 <span className="field-label">Item</span>
-                <select className="field" name="itemId" required defaultValue="">
+                <select className="field" name="itemId" required defaultValue={selectedItemId}>
                   <option value="" disabled>
                     Select SKU
                   </option>

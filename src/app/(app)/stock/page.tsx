@@ -51,8 +51,16 @@ export default async function StockPage() {
                             </div>
                           </Link>
                         </td>
-                        <td className="sku">{row.item.sku}</td>
-                        <td>{row.item.name}</td>
+                        <td className="sku">
+                          <Link href={`/items/${row.item.id}`} className="row-link-target">
+                            {row.item.sku}
+                          </Link>
+                        </td>
+                        <td>
+                          <Link href={`/items/${row.item.id}`} className="row-link-target">
+                            {row.item.name}
+                          </Link>
+                        </td>
                         <td className="font-semibold">{row.qty}</td>
                         <td>
                           <span className={chip.className}>{chip.label}</span>

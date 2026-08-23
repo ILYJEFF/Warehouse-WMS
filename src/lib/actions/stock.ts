@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import { LocationKind, MoveType, Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/auth";
@@ -38,6 +39,40 @@ export async function createItem(formData: FormData) {
   revalidatePath("/items");
   revalidatePath("/");
   revalidatePath("/stock");
+}
+
+export async function updateItem(formData: FormData) {
+  await authed();
+  const id = String(formData.get("id") ?? "").trim();
+  const sku = String(formData.get("sku") ?? "")
+    .trim()
+    .toUpperCase();
+  const name = String(formData.get("name") ?? "").trim();
+  if (!id || !sku || !name) throw new Error("SKU and name are required");
+
+  const skuTaken = await prisma.item.findFirst({
+    where: { sku, NOT: { id } },
+    select: { id: true },
+  });
+  if (skuTaken) throw new Error("That SKU is already in use");
+
+  await prisma.item.update({
+    where: { id },
+    data: {
+      sku,
+      name,
+      category: String(formData.get("category") ?? "General").trim() || "General",
+      unit: String(formData.get("unit") ?? "ea").trim() || "ea",
+      reorderPoint: Math.max(0, parseIntSafe(formData.get("reorderPoint"))),
+      unitCostCents: Math.max(0, Math.round(Number(formData.get("unitCost") ?? 0) * 100)),
+      notes: String(formData.get("notes") ?? "").trim() || null,
+    },
+  });
+  revalidatePath("/items");
+  revalidatePath(`/items/${id}`);
+  revalidatePath("/");
+  revalidatePath("/stock");
+  redirect(`/items/${id}?saved=1`);
 }
 
 export async function createLocation(formData: FormData) {

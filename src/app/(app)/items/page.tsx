@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { createItem } from "@/lib/actions/stock";
 import { prisma } from "@/lib/prisma";
 import { money, stockChip } from "@/lib/utils";
@@ -41,7 +42,14 @@ export default async function ItemsPage() {
               </label>
               <label>
                 <span className="field-label">Unit cost ($)</span>
-                <input className="field" type="number" name="unitCost" step="0.01" defaultValue={0} min={0} />
+                <input
+                  className="field"
+                  type="number"
+                  name="unitCost"
+                  step="0.01"
+                  defaultValue={0}
+                  min={0}
+                />
               </label>
               <div className="sm:col-span-2 lg:col-span-3">
                 <button type="submit" className="btn-primary">
@@ -73,9 +81,17 @@ export default async function ItemsPage() {
                     const qty = item.balances.reduce((sum, b) => sum + b.qty, 0);
                     const chip = stockChip(qty, item.reorderPoint);
                     return (
-                      <tr key={item.id}>
-                        <td className="sku">{item.sku}</td>
-                        <td>{item.name}</td>
+                      <tr key={item.id} className="row-link">
+                        <td className="sku">
+                          <Link href={`/items/${item.id}`} className="row-link-target">
+                            {item.sku}
+                          </Link>
+                        </td>
+                        <td>
+                          <Link href={`/items/${item.id}`} className="row-link-target">
+                            {item.name}
+                          </Link>
+                        </td>
                         <td>{item.category}</td>
                         <td>{qty}</td>
                         <td>{item.reorderPoint}</td>
