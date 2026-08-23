@@ -8,9 +8,8 @@ datasource db {
 }
 
 enum Role {
-  OWNER
-  DISPATCH
-  TECH
+  ADMIN
+  USER
 }
 
 enum LocationKind {
@@ -31,7 +30,8 @@ model User {
   email          String     @unique
   name           String
   passwordHash   String
-  role           Role       @default(TECH)
+  role           Role       @default(USER)
+  active         Boolean    @default(true)
   createdAt      DateTime   @default(now())
   updatedAt      DateTime   @updatedAt
   moves          StockMove[]

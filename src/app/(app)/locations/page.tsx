@@ -13,6 +13,7 @@ export default async function LocationsPage() {
       },
     }),
     prisma.user.findMany({
+      where: { active: true },
       orderBy: [{ name: "asc" }],
       select: { id: true, name: true, email: true, role: true },
     }),

@@ -9,6 +9,7 @@ import {
   MapPin,
   PackageMinus,
   PackagePlus,
+  Users,
   Warehouse,
 } from "lucide-react";
 
@@ -22,12 +23,15 @@ const NAV = [
   { href: "/moves", label: "Recent Activity", icon: ClipboardList },
 ] as const;
 
-export function SideNav() {
+const ADMIN_NAV = [{ href: "/users", label: "Users", icon: Users }] as const;
+
+export function SideNav({ showAdmin = false }: { showAdmin?: boolean }) {
   const pathname = usePathname();
+  const items = showAdmin ? [...NAV, ...ADMIN_NAV] : [...NAV];
 
   return (
     <ul className="m-0 list-none p-0">
-      {NAV.map((item) => {
+      {items.map((item) => {
         const active =
           item.href === "/"
             ? pathname === "/"

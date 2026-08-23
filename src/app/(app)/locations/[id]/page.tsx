@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { assignTruckPerson } from "@/lib/actions/stock";
 import { LocationStockTable } from "@/components/location-stock-table";
+import { roleLabel } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { money } from "@/lib/utils";
 
@@ -26,6 +27,7 @@ export default async function LocationDetailPage({ params }: Props) {
       },
     }),
     prisma.user.findMany({
+      where: { active: true },
       orderBy: [{ name: "asc" }],
       select: { id: true, name: true },
     }),
@@ -102,7 +104,9 @@ export default async function LocationDetailPage({ params }: Props) {
                     <div className="assignee-name">{location.assignedUser.name}</div>
                     <div className="text-sm text-muted">{location.assignedUser.email}</div>
                     <div className="mt-2">
-                      <span className="chip chip-muted">{location.assignedUser.role}</span>
+                      <span className="chip chip-muted">
+                        {roleLabel(location.assignedUser.role)}
+                      </span>
                     </div>
                   </div>
                 ) : (

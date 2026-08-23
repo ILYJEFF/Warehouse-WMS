@@ -6,7 +6,10 @@ import {
   clearSession,
   createSession,
   hashPassword,
+  MIN_PASSWORD_LENGTH,
   requireUser,
+  safeRedirectPath,
+  validatePassword,
   verifyPassword,
 } from "@/lib/auth";
 
@@ -15,17 +18,27 @@ export async function loginAction(formData: FormData) {
     .trim()
     .toLowerCase();
   const password = String(formData.get("password") ?? "");
-  const next = String(formData.get("next") ?? "/");
+  const next = safeRedirectPath(String(formData.get("next") ?? "/"));
 
+  if (!email || !password) {
+    redirect("/login?error=1");
+  }
+
+  const passwordError = validatePassword(password);
   const userCount = await prisma.user.count();
+
   if (userCount === 0) {
-    const name = String(formData.get("name") ?? "Owner").trim() || "Owner";
+    if (passwordError) {
+      redirect(`/login?error=password&next=${encodeURIComponent(next)}`);
+    }
+    const name = String(formData.get("name") ?? "Admin").trim() || "Admin";
     const user = await prisma.user.create({
       data: {
         email,
         name,
         passwordHash: await hashPassword(password),
-        role: "OWNER",
+        role: "ADMIN",
+        active: true,
       },
     });
     await createSession({
@@ -34,11 +47,15 @@ export async function loginAction(formData: FormData) {
       name: user.name,
       role: user.role,
     });
-    redirect(next || "/");
+    redirect(next);
   }
 
   const user = await prisma.user.findUnique({ where: { email } });
-  if (!user || !(await verifyPassword(password, user.passwordHash))) {
+  if (
+    !user ||
+    !user.active ||
+    !(await verifyPassword(password, user.passwordHash))
+  ) {
     redirect("/login?error=1");
   }
 
@@ -48,7 +65,7 @@ export async function loginAction(formData: FormData) {
     name: user.name,
     role: user.role,
   });
-  redirect(next || "/");
+  redirect(next);
 }
 
 export async function logoutAction() {
@@ -61,3 +78,5 @@ export async function ensureAuthed() {
   if (!user) redirect("/login");
   return user;
 }
+
+export { MIN_PASSWORD_LENGTH };

@@ -14,7 +14,8 @@ async function main() {
     create: {
       email,
       name,
-      role: "OWNER",
+      role: "ADMIN",
+      active: true,
       passwordHash: await bcrypt.hash(password, 12),
     },
   });
@@ -25,7 +26,8 @@ async function main() {
     create: {
       email: "tech@techchefstx.com",
       name: "Field Tech",
-      role: "TECH",
+      role: "USER",
+      active: true,
       passwordHash: await bcrypt.hash("Oatmilk1769!", 12),
     },
   });
