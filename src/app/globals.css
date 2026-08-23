@@ -1267,6 +1267,50 @@ table.data tbody tr.row-link:hover td:not(:has(form)) {
   background: var(--bg);
 }
 
+.header-search {
+  display: flex;
+  width: min(100%, 36rem);
+  min-width: 20rem;
+  overflow: hidden;
+  border-radius: 4px;
+  background: #fff;
+  box-shadow: 0 1px 2px rgb(0 0 0 / 12%);
+}
+
+.header-search-input {
+  width: 100%;
+  min-width: 0;
+  border: 0;
+  padding: 0.7rem 1rem;
+  color: #444;
+  font-size: 15px;
+  outline: none;
+  background: transparent;
+}
+
+.header-search-input::placeholder {
+  color: #9aa0a6;
+}
+
+.header-search-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 3rem;
+  border: 0;
+  border-left: 1px solid #e8ebef;
+  background: #f4f6f8;
+  color: #555;
+  cursor: pointer;
+  transition: background 120ms ease, color 120ms ease;
+}
+
+.header-search-btn:hover {
+  background: #e9eef2;
+  color: #3c8dbc;
+}
+
 .login-logo {
   display: block;
   width: 72px;

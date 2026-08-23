@@ -20,7 +20,7 @@ export function AppShell({
   return (
     <div className="min-h-screen">
       <ActivityTracker />
-      <header className="flex h-[50px] items-center justify-between bg-[#3c8dbc] px-4 text-white shadow-sm">
+      <header className="flex h-[58px] items-center justify-between gap-4 bg-[#3c8dbc] px-4 text-white shadow-sm">
         <div className="flex min-w-0 items-center gap-2 sm:gap-3">
           <MobileNav showAdmin={admin} userName={user.name} roleLabel={label} />
           <Link
@@ -33,23 +33,20 @@ export function AppShell({
             <span className="truncate text-lg font-light">Techchefs WMS</span>
           </Link>
         </div>
-        <div className="hidden items-center gap-2 md:flex">
-          <div className="flex overflow-hidden rounded-sm bg-white">
+        <div className="hidden min-w-0 flex-1 justify-center px-4 md:flex lg:px-8">
+          <div className="header-search">
             <input
-              className="w-48 border-0 px-3 py-1.5 text-sm text-[#555] outline-none"
+              className="header-search-input"
               placeholder="Lookup by SKU"
               readOnly
+              aria-label="Lookup by SKU"
             />
-            <button
-              type="button"
-              className="border-0 bg-[#f4f4f4] px-3 text-[#666]"
-              aria-label="Search"
-            >
-              <Search className="h-4 w-4" />
+            <button type="button" className="header-search-btn" aria-label="Search">
+              <Search className="h-5 w-5" />
             </button>
           </div>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex shrink-0 items-center gap-2">
           <span className="hidden items-center gap-2 text-sm sm:flex">
             <User className="h-4 w-4" />
             {user.name}
@@ -60,7 +57,7 @@ export function AppShell({
           <form action={logoutAction} className="hidden sm:block">
             <button
               type="submit"
-              className="rounded-sm border border-white/30 bg-white/10 px-3 py-1 text-xs text-white hover:bg-white/20"
+              className="rounded-sm border border-white/30 bg-white/10 px-3 py-1.5 text-xs text-white hover:bg-white/20"
             >
               Sign out
             </button>
@@ -68,7 +65,7 @@ export function AppShell({
         </div>
       </header>
 
-      <div className="flex min-h-[calc(100vh-50px)]">
+      <div className="flex min-h-[calc(100vh-58px)]">
         <aside className="hidden w-[230px] shrink-0 bg-[#222d32] lg:block">
           <div className="border-b border-[#1a2226] px-4 py-3">
             <p className="truncate text-xs text-[#4b646f]">MAIN NAVIGATION</p>
