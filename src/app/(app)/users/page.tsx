@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { format, formatDistanceToNowStrict } from "date-fns";
 import { AddUserPanel } from "@/components/add-user-panel";
+import { BackButton } from "@/components/back-button";
 import {
   isAdmin,
   MIN_PASSWORD_LENGTH,
@@ -59,14 +60,12 @@ export default async function UsersPage({
   return (
     <>
       <div className="content-header">
+        <div className="content-header-row">
+          <BackButton href="/settings" label="Back to settings" />
+        </div>
         <h1>Users</h1>
       </div>
       <section className="content">
-        <p className="mb-4 text-sm text-[#777]">
-          <Link href="/settings" className="text-[#3c8dbc]">
-            Back to settings
-          </Link>
-        </p>
         {params.created ? (
           <div className="mb-4 rounded bg-[#dff0d8] px-3 py-2 text-sm text-[#3c763d]">
             User created.

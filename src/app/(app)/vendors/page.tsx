@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { BackButton } from "@/components/back-button";
 import { VendorsTable } from "@/components/vendors-table";
 import { createVendor, updateVendor } from "@/lib/actions/vendors";
 import { isAdmin, requireUser } from "@/lib/auth";
@@ -47,19 +48,17 @@ export default async function VendorsPage({
   return (
     <>
       <div className="content-header">
+        <div className="content-header-row">
+          <BackButton href="/settings" label="Back to settings" />
+        </div>
         <h1>Vendors</h1>
       </div>
       <section className="content">
         <p className="mb-4 text-sm text-[#777]">
-          <Link href="/settings" className="text-[#3c8dbc]">
-            Back to settings
-          </Link>
-          {" · "}
           <Link href="/purchasing" className="text-[#3c8dbc]">
-            Purchasing
+            Open purchasing list
           </Link>
         </p>
-
         {successMessage ? (
           <div className="mb-4 rounded bg-[#dff0d8] px-3 py-2 text-sm text-[#3c763d]">
             {successMessage}

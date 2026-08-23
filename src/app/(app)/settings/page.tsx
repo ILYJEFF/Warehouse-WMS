@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { ArrowRight, Store, Tags, Users } from "lucide-react";
+import { BackButton } from "@/components/back-button";
 import { DemoDataPanel } from "@/components/demo-data-panel";
 import { isAdmin, requireUser } from "@/lib/auth";
 import { demoStatsTotal, getDemoStats } from "@/lib/demo-seed";
@@ -54,6 +55,9 @@ export default async function SettingsPage({
   return (
     <>
       <div className="content-header">
+        <div className="content-header-row">
+          <BackButton href="/" label="Back to dashboard" />
+        </div>
         <h1>Settings</h1>
       </div>
       <section className="content">

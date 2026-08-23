@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { redirect, notFound } from "next/navigation";
+import { BackButton } from "@/components/back-button";
 import { updateUser } from "@/lib/actions/users";
 import {
   isAdmin,
@@ -46,15 +47,12 @@ export default async function EditUserPage({
   return (
     <>
       <div className="content-header">
+        <div className="content-header-row">
+          <BackButton href="/users" label="Back to users" />
+        </div>
         <h1>Edit User</h1>
       </div>
       <section className="content">
-        <p className="mb-4 text-sm text-[#777]">
-          <Link href="/users" className="text-[#3c8dbc]">
-            Back to users
-          </Link>
-        </p>
-
         {query.saved ? (
           <div className="mb-4 rounded bg-[#dff0d8] px-3 py-2 text-sm text-[#3c763d]">
             Changes saved.
