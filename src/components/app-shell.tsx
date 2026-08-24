@@ -17,7 +17,7 @@ export function AppShell({
 }) {
   const admin = isAdmin(user.role);
   const label = roleLabel(user.role);
-  const siblingUrl = process.env.SIBLING_APP_URL?.replace(/\/$/, "");
+  const hubUrl = process.env.HUB_APP_URL?.replace(/\/$/, "");
 
   return (
     <div className="min-h-screen">
@@ -29,18 +29,19 @@ export function AppShell({
             href="/"
             className="flex min-w-0 items-center gap-2 text-white no-underline hover:no-underline"
           >
-            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded bg-white/20 text-sm font-bold">
-              TC
+            <span className="flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded bg-white/20">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/logo.svg" alt="" width={32} height={32} className="h-8 w-8" />
             </span>
             <span className="truncate text-lg font-light">Techchefs WMS</span>
           </Link>
-          {siblingUrl ? (
+          {hubUrl ? (
             <a
-              href={siblingUrl}
+              href={hubUrl}
               className="hidden items-center gap-1 rounded-sm border border-white/25 bg-white/10 px-2 py-1 text-[11px] uppercase tracking-wide text-white no-underline hover:bg-white/20 hover:no-underline sm:inline-flex"
-              title="Open Recruiting ATS"
+              title="Open Techchefs Hub"
             >
-              ATS
+              Hub
               <ExternalLink className="h-3 w-3 opacity-80" />
             </a>
           ) : null}
