@@ -1,6 +1,9 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { jwtVerify } from "jose";
-import { SESSION_COOKIE } from "@/lib/auth-constants";
+import {
+  LEGACY_SESSION_COOKIE,
+  SESSION_COOKIE,
+} from "@/lib/auth-constants";
 
 const PUBLIC = ["/login", "/api/health"];
 
@@ -20,7 +23,9 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  const token = request.cookies.get(SESSION_COOKIE)?.value;
+  const token =
+    request.cookies.get(SESSION_COOKIE)?.value ??
+    request.cookies.get(LEGACY_SESSION_COOKIE)?.value;
   const login = new URL("/login", request.url);
   login.searchParams.set("next", pathname);
 
@@ -38,6 +43,7 @@ export async function middleware(request: NextRequest) {
   } catch {
     const res = NextResponse.redirect(login);
     res.cookies.delete(SESSION_COOKIE);
+    res.cookies.delete(LEGACY_SESSION_COOKIE);
     return res;
   }
 

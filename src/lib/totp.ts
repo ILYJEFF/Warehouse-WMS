@@ -2,7 +2,7 @@ import { createHash } from "crypto";
 import * as OTPAuth from "otpauth";
 import QRCode from "qrcode";
 
-const ISSUER = "Techchefs WMS";
+const ISSUER = "Techchefs";
 
 export function generateTotpSecret() {
   const secret = new OTPAuth.Secret({ size: 20 });

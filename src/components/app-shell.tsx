@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { User } from "lucide-react";
+import { ExternalLink, User } from "lucide-react";
 import { logoutAction } from "@/lib/actions/auth";
 import type { SessionUser } from "@/lib/auth";
 import { isAdmin, roleLabel } from "@/lib/auth";
@@ -17,6 +17,7 @@ export function AppShell({
 }) {
   const admin = isAdmin(user.role);
   const label = roleLabel(user.role);
+  const siblingUrl = process.env.SIBLING_APP_URL?.replace(/\/$/, "");
 
   return (
     <div className="min-h-screen">
@@ -33,6 +34,16 @@ export function AppShell({
             </span>
             <span className="truncate text-lg font-light">Techchefs WMS</span>
           </Link>
+          {siblingUrl ? (
+            <a
+              href={siblingUrl}
+              className="hidden items-center gap-1 rounded-sm border border-white/25 bg-white/10 px-2 py-1 text-[11px] uppercase tracking-wide text-white no-underline hover:bg-white/20 hover:no-underline sm:inline-flex"
+              title="Open Recruiting ATS"
+            >
+              ATS
+              <ExternalLink className="h-3 w-3 opacity-80" />
+            </a>
+          ) : null}
         </div>
         <div className="hidden min-w-0 flex-1 justify-center px-4 md:flex lg:px-8">
           <HeaderSkuSearch />

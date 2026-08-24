@@ -3,6 +3,9 @@ import { SignJWT, jwtVerify } from "jose";
 import bcrypt from "bcryptjs";
 import type { Role } from "@prisma/client";
 import {
+  LEGACY_PENDING_2FA_COOKIE,
+  LEGACY_SESSION_COOKIE,
+  LEGACY_TRUSTED_2FA_COOKIE,
   MIN_PASSWORD_LENGTH,
   PENDING_2FA_COOKIE,
   SESSION_COOKIE,
@@ -73,6 +76,26 @@ export async function verifyPassword(password: string, hash: string) {
   return bcrypt.compare(password, hash);
 }
 
+function cookieSecure() {
+  return process.env.APP_URL?.startsWith("https://") ?? false;
+}
+
+function cookieDomain(): string | undefined {
+  const domain = process.env.COOKIE_DOMAIN?.trim();
+  return domain || undefined;
+}
+
+function cookieBase(maxAge: number) {
+  return {
+    httpOnly: true,
+    sameSite: "lax" as const,
+    secure: cookieSecure(),
+    path: "/",
+    maxAge,
+    ...(cookieDomain() ? { domain: cookieDomain() } : {}),
+  };
+}
+
 export async function createSession(user: SessionUser) {
   const token = await new SignJWT({
     email: user.email,
@@ -86,22 +109,17 @@ export async function createSession(user: SessionUser) {
     .sign(secret());
 
   const jar = await cookies();
-  jar.set(SESSION_COOKIE, token, {
-    httpOnly: true,
-    sameSite: "lax",
-    secure: cookieSecure(),
-    path: "/",
-    maxAge: 60 * 60 * 24 * 14,
-  });
+  jar.set(SESSION_COOKIE, token, cookieBase(60 * 60 * 24 * 14));
+  jar.delete(LEGACY_SESSION_COOKIE);
 }
 
 export async function clearSession() {
   const jar = await cookies();
   jar.delete(SESSION_COOKIE);
-}
-
-function cookieSecure() {
-  return process.env.APP_URL?.startsWith("https://") ?? false;
+  jar.delete(LEGACY_SESSION_COOKIE);
+  if (cookieDomain()) {
+    jar.set(SESSION_COOKIE, "", { ...cookieBase(0), maxAge: 0 });
+  }
 }
 
 /** Short-lived proof that password was accepted; full session waits for TOTP. */
@@ -117,18 +135,14 @@ export async function createPending2fa(userId: string, next: string) {
     .sign(secret());
 
   const jar = await cookies();
-  jar.set(PENDING_2FA_COOKIE, token, {
-    httpOnly: true,
-    sameSite: "lax",
-    secure: cookieSecure(),
-    path: "/",
-    maxAge: 60 * 10,
-  });
+  jar.set(PENDING_2FA_COOKIE, token, cookieBase(60 * 10));
+  jar.delete(LEGACY_PENDING_2FA_COOKIE);
 }
 
 export async function clearPending2fa() {
   const jar = await cookies();
   jar.delete(PENDING_2FA_COOKIE);
+  jar.delete(LEGACY_PENDING_2FA_COOKIE);
 }
 
 export async function readPending2fa(): Promise<{
@@ -136,7 +150,9 @@ export async function readPending2fa(): Promise<{
   next: string;
 } | null> {
   const jar = await cookies();
-  const token = jar.get(PENDING_2FA_COOKIE)?.value;
+  const token =
+    jar.get(PENDING_2FA_COOKIE)?.value ??
+    jar.get(LEGACY_PENDING_2FA_COOKIE)?.value;
   if (!token) return null;
 
   try {
@@ -167,24 +183,22 @@ export async function createTrusted2fa(userId: string, totpSecret: string) {
     .sign(secret());
 
   const jar = await cookies();
-  jar.set(TRUSTED_2FA_COOKIE, token, {
-    httpOnly: true,
-    sameSite: "lax",
-    secure: cookieSecure(),
-    path: "/",
-    maxAge,
-  });
+  jar.set(TRUSTED_2FA_COOKIE, token, cookieBase(maxAge));
+  jar.delete(LEGACY_TRUSTED_2FA_COOKIE);
 }
 
 export async function clearTrusted2fa() {
   const jar = await cookies();
   jar.delete(TRUSTED_2FA_COOKIE);
+  jar.delete(LEGACY_TRUSTED_2FA_COOKIE);
 }
 
 /** True when this browser already passed 2FA for this user recently. */
 export async function hasTrusted2fa(userId: string, totpSecret: string) {
   const jar = await cookies();
-  const token = jar.get(TRUSTED_2FA_COOKIE)?.value;
+  const token =
+    jar.get(TRUSTED_2FA_COOKIE)?.value ??
+    jar.get(LEGACY_TRUSTED_2FA_COOKIE)?.value;
   if (!token) return false;
 
   try {
@@ -204,7 +218,8 @@ export async function hasTrusted2fa(userId: string, totpSecret: string) {
 
 export async function readSession(): Promise<SessionUser | null> {
   const jar = await cookies();
-  const token = jar.get(SESSION_COOKIE)?.value;
+  const token =
+    jar.get(SESSION_COOKIE)?.value ?? jar.get(LEGACY_SESSION_COOKIE)?.value;
   if (!token) return null;
 
   try {
